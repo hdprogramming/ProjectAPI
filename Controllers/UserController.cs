@@ -28,11 +28,11 @@ namespace ProjectApi.Controllers
         /// </summary>
         [HttpGet]
         [Authorize(Roles = "Admin")] 
-        public async Task<ActionResult<IEnumerable<UserDto>>> GetUsers()
+        public async Task<ActionResult<IEnumerable<SecuredUserDto>>> GetUsers()
         {
             
             var users = await _context.Users
-                .Select(u => new UserDto {  UserName = u.UserName, Email = u.EMail })
+                .Select(u => new SecuredUserDto{  UserName = u.UserName, Email = u.EMail,ProfileImageUrl=u.ProfileImageUrl })
                 .ToListAsync();
             return Ok(users);
         }
@@ -43,16 +43,26 @@ namespace ProjectApi.Controllers
         /// Kullanıcı ya kendi bilgilerine ya da "Admin" rolündeyse başka bir kullanıcının bilgilerine erişebilir.
         /// </summary>
         [HttpGet("{id}")]
-        public async Task<ActionResult<UserDTODetails>> GetUser(string id)
+        [Authorize]
+        public async Task<ActionResult<UserDTODetails>> GetUser(Guid id)
         {
-            var user = await _context.Users.FirstOrDefaultAsync(u => u.Id.ToString() == id);
+             if (!IsUserAuthorized(id))
+            {
+                return Forbid(); // 403 Forbidden - Yetkiniz yok.
+            }
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.Id== id);
 
             if (user == null)
             {
                 return NotFound(); // 404 Not Found - Kullanıcı bulunamadı.
             }
 
-            var userDto = new UserDTODetails { UserID = user.Id.ToString(), Name = user.UserName, Email = user.EMail };
+            var userDto = new UserDTODetails {
+                UserID = user.Id.ToString(),
+                UserName = user.UserName,
+                Email = user.EMail,
+                ProfileImageUrl=user.ProfileImageUrl
+            };
             return Ok(userDto);
         }
         // GET: api/users/5
@@ -94,12 +104,14 @@ namespace ProjectApi.Controllers
                 return NotFound();
             }
 
-            // DTO'dan gelen verilerle entity'yi güncelle
-            if(updateUserDto.UserName!=null)
-            userToUpdate.UserName = updateUserDto.UserName;
-            userToUpdate.ProfileImageUrl = updateUserDto.ProfileImageUrl;
-            string PasswordHashed = _hasherUtil.HashPassword(userToUpdate, updateUserDto.Password);
-            userToUpdate.PasswordHashed = PasswordHashed;
+            // DTO'dan gelen verileri denetle ona göre entity'yi güncelle
+            userToUpdate.UserName = updateUserDto.UserName ?? userToUpdate.UserName;
+            userToUpdate.ProfileImageUrl = updateUserDto.ProfileImageUrl ?? userToUpdate.ProfileImageUrl;
+            if (updateUserDto.Password != null)
+            {
+                string PasswordHashed = _hasherUtil.HashPassword(userToUpdate, updateUserDto.Password);
+                userToUpdate.PasswordHashed = PasswordHashed;
+            }
             _context.Users.Update(userToUpdate);
             await _context.SaveChangesAsync();
 

@@ -13,6 +13,12 @@ namespace ProjectApi.DTOs
         public string? Password { get; set; }
         public string ProfileImageUrl { get; set; } = string.Empty;
     }
+    public class SecuredUserDto
+    {
+        public string? UserName { get; set; }
+        public string? Email { get; set; }
+        public string ProfileImageUrl { get; set; } = string.Empty;
+    }
     public class CreateUserDto
     {
         public string? UserName { get; set; }
@@ -24,15 +30,15 @@ namespace ProjectApi.DTOs
     public class UpdateUserDto
     {
         public string? UserName { get; set; }
-        [Required]
-        public string Password { get; set; }
-        public string ProfileImageUrl { get; set; } = string.Empty;
+        
+        public string? Password { get; set; }
+        public string? ProfileImageUrl { get; set; } 
     }
     public class UserDTODetails
     {
         public string? UserID{ get; set; }
-         public string? Name { get; set; }
+         public string? UserName { get; set; }
         public string? Email { get; set; }
-        public string? Password { get; set; }
+        public string ProfileImageUrl { get; set; } = string.Empty;
     }
 }
