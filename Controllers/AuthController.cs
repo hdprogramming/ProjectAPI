@@ -2,15 +2,14 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity; // IPasswordHasher için
-using ProjectApi.DTOs;
+using ProjectAPI.DTOs;
 using ProjectAPI.Models;
 using ProjectAPI.Utils;
-using ProjectAPI.DTOs;
-using Microsoft.EntityFrameworkCore.Metadata.Internal;
+
 
 // using ProjectApi.Services; // IJwtService'in olduğu namespace
 
-namespace ProjectApi.Controllers
+namespace ProjectAPI.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]

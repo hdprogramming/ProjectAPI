@@ -1,5 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
-using ProjectApi.DTOs;
+using ProjectAPI.DTOs;
 using ProjectAPI.Models;
 using Microsoft.AspNetCore.Identity;
 namespace ProjectAPI.Controllers

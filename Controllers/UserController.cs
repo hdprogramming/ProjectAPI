@@ -1,12 +1,14 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using ProjectApi.DTOs;
+using ProjectAPI.DTOs;
 using ProjectAPI.Models;
 using ProjectAPI.Utils;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Identity;
-namespace ProjectApi.Controllers
+
+
+namespace ProjectAPI.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
@@ -15,11 +17,12 @@ namespace ProjectApi.Controllers
     {
         private readonly AppDbContext _context;
         private readonly IPasswordHasher<User> _hasherUtil;
-
-        public UsersController(AppDbContext context,IPasswordHasher<User> hasherUtil)
+        
+                 public UsersController(AppDbContext context,IPasswordHasher<User> hasherUtil)
         {
             _context = context;
-            _hasherUtil = hasherUtil;
+            _hasherUtil = hasherUtil;            
+            
         }
 
         // GET: api/users

@@ -140,7 +140,7 @@ namespace ProjectAPI.Controllers
         // PUT: api/Projects/5
         [HttpPut("{id}")]
         [Authorize]
-        public async Task<IActionResult> UpdateProject(int id, ProjectDto projectUpdate)
+        public async Task<IActionResult> UpdateProject(int id, ProjectUpdateDto projectUpdate)
         {
             if (id != projectUpdate.id)
             {
@@ -161,12 +161,12 @@ namespace ProjectAPI.Controllers
             }
 
             // Güncelleme alanlarını eşle
-            existingProject.IconName = projectUpdate.IconName;
-            existingProject.Name = projectUpdate.Name!;
-            existingProject.Description = projectUpdate.Description;
-            existingProject.Content = projectUpdate.Content;
-            existingProject.isAlive = projectUpdate.isAlive;
-            existingProject.Status = projectUpdate.Status;
+            existingProject.IconName =projectUpdate.IconName??existingProject.IconName;
+            existingProject.Name = projectUpdate.Name??existingProject.Name;
+            existingProject.Description = projectUpdate.Description??existingProject.Description;
+            existingProject.Content = projectUpdate.Content??existingProject.Content;
+            existingProject.isAlive = projectUpdate.isAlive??existingProject.isAlive;
+            existingProject.Status = projectUpdate.Status??existingProject.Status;
             
             // existingProject.UserId ve StartingDate'e dokunmuyoruz.
 

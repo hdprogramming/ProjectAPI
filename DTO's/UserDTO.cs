@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace ProjectApi.DTOs
+namespace ProjectAPI.DTOs
 {
     /// <summary>
     /// API'den dışarıya kullanıcı bilgisi dönerken kullanılacak model.
