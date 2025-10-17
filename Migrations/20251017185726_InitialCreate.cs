@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace ProjectAPI.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialCreate2 : Migration
+    public partial class InitialCreate : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -17,9 +17,10 @@ namespace ProjectAPI.Migrations
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     ProfileImageUrl = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    EMail = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    UserName = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Password = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                    EMail = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    UserName = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    PasswordHashed = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    isRole = table.Column<string>(type: "nvarchar(max)", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -73,6 +74,11 @@ namespace ProjectAPI.Migrations
                         onDelete: ReferentialAction.Cascade);
                 });
 
+            migrationBuilder.InsertData(
+                table: "Users",
+                columns: new[] { "Id", "EMail", "PasswordHashed", "ProfileImageUrl", "UserName", "isRole" },
+                values: new object[] { new Guid("b22698b8-42a2-4115-9631-1c2d1e2ac5f7"), "admin@projectapi.com", "AQAAAAIAAYagAAAAEDiRNCYoDBz1VQzr+rtj7cicug4dhAXqqYyxUBgdawRxt8dSOMpIGW+KTVm2m3YsUQ==", "", "admin", "Admin" });
+
             migrationBuilder.CreateIndex(
                 name: "IX_Projects_UserId",
                 table: "Projects",
@@ -82,6 +88,12 @@ namespace ProjectAPI.Migrations
                 name: "IX_RefreshTokens_UserID",
                 table: "RefreshTokens",
                 column: "UserID");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Users_EMail",
+                table: "Users",
+                column: "EMail",
+                unique: true);
         }
 
         /// <inheritdoc />

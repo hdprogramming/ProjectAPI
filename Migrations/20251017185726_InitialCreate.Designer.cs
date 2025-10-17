@@ -11,8 +11,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace ProjectAPI.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20251016233845_UserUpdateSeeding2")]
-    partial class UserUpdateSeeding2
+    [Migration("20251017185726_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -101,7 +101,8 @@ namespace ProjectAPI.Migrations
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("EMail")
-                        .HasColumnType("nvarchar(max)");
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("PasswordHashed")
                         .IsRequired()
@@ -112,7 +113,6 @@ namespace ProjectAPI.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("UserName")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("isRole")
@@ -121,6 +121,9 @@ namespace ProjectAPI.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("EMail")
+                        .IsUnique();
+
                     b.ToTable("Users");
 
                     b.HasData(
@@ -128,10 +131,10 @@ namespace ProjectAPI.Migrations
                         {
                             Id = new Guid("b22698b8-42a2-4115-9631-1c2d1e2ac5f7"),
                             EMail = "admin@projectapi.com",
-                            PasswordHashed = "AQAAAAIAAYagAAAAELkAZqnPHL2P6A9odPb4+6uW7wvkO7UcLfeWrydc+r2BDvI3x5s1DcNwp2tZXvXdyg==",
+                            PasswordHashed = "AQAAAAIAAYagAAAAEDiRNCYoDBz1VQzr+rtj7cicug4dhAXqqYyxUBgdawRxt8dSOMpIGW+KTVm2m3YsUQ==",
                             ProfileImageUrl = "",
                             UserName = "admin",
-                            isRole = "User"
+                            isRole = "Admin"
                         });
                 });
 

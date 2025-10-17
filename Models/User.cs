@@ -7,10 +7,10 @@ namespace ProjectAPI.Models
         // Primary Key
         public Guid Id { get; set; }
         public string ProfileImageUrl { get; set; } = string.Empty;
-        public string? EMail{ get; set; }
+        public string EMail{ get; set; }
 
         // Kullanıcı Adı (Örn: "admin", "tester")
-        public string UserName { get; set; } = string.Empty;
+        public string? UserName { get; set; } = string.Empty;
         public string PasswordHashed { get; set; } = string.Empty;
         public string isRole { get; set; } = "User";
         public ICollection<Project> Projects=new List<Project>();

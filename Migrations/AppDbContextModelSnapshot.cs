@@ -98,7 +98,8 @@ namespace ProjectAPI.Migrations
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("EMail")
-                        .HasColumnType("nvarchar(max)");
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("PasswordHashed")
                         .IsRequired()
@@ -109,7 +110,6 @@ namespace ProjectAPI.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("UserName")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("isRole")
@@ -117,6 +117,9 @@ namespace ProjectAPI.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("EMail")
+                        .IsUnique();
 
                     b.ToTable("Users");
 

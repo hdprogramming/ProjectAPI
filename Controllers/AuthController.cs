@@ -26,8 +26,7 @@ namespace ProjectApi.Controllers
             _context = context;
             _passwordHasher = passwordHasher;
             _jwtService = jwtService;
-        }
-
+        }        
         // POST: api/auth/register
         [HttpPost("register")]
         [AllowAnonymous] // Herkesin erişebilmesi için
@@ -38,11 +37,11 @@ namespace ProjectApi.Controllers
             {
                 return BadRequest("Bu e-posta adresi zaten kullanılıyor.");
             }
-
+            UsernameChecker UC = new UsernameChecker();
             var user = new User
             {
                 Id = Guid.NewGuid(),
-                UserName = createUserDto.UserName,
+                UserName = UC.UsernameCheckerGenerator(createUserDto.UserName,createUserDto.Email),
                 EMail = createUserDto.Email,
             };
 
@@ -82,7 +81,7 @@ namespace ProjectApi.Controllers
             var token = await _jwtService.GenerateToken(user);
             var RefreshToken = await _jwtService.GenerateAndRefreshToken(user.Id);
 
-            return Ok(new { Token = token, refreshToken = RefreshToken });
+            return Ok(new { UserID=user.Id,Token = token, refreshToken = RefreshToken });
         }
         [HttpPost("Refresh")]
         public async Task<IActionResult> Refresh(RefreshTokenDto refreshTokenDto)

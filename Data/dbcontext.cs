@@ -18,7 +18,10 @@ public class AppDbContext : DbContext
     // İlişkileri ve kısıtlamaları yapılandırmak istersen bu metodu kullanırsın.
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-         base.OnModelCreating(modelBuilder);
+        base.OnModelCreating(modelBuilder);
+         modelBuilder.Entity<User>()
+        .HasIndex(u => u.EMail)
+        .IsUnique(); // E-posta alanının benzersiz olmasını zorunlu kılar.
         modelBuilder.Entity<Project>()
             .HasOne(p => p.user)
             .WithMany(u => u.Projects)

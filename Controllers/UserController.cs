@@ -63,10 +63,10 @@ namespace ProjectApi.Controllers
         [HttpPost]
         public async Task<ActionResult<string>> CreateUser(CreateUserDto createUserDto)
         {
-
+            UsernameChecker UC = new UsernameChecker();
             var user = new User
             {
-                UserName = createUserDto.UserName!,
+                UserName = UC.UsernameCheckerGenerator(createUserDto.UserName,createUserDto.Email),
                 EMail = createUserDto.Email,
             };
             string hashed = _hasherUtil.HashPassword(user,createUserDto.Password);
@@ -79,15 +79,15 @@ namespace ProjectApi.Controllers
         /// <summary>
         /// Bir kullanıcının bilgilerini günceller. Kullanıcı sadece kendi bilgilerini güncelleyebilir.
         /// </summary>
-        [HttpPut("{id}")]
-        [Authorize(Roles = "Admin")] 
-        public async Task<IActionResult> UpdateUser(Guid id, [FromBody] UpdateUserDto updateUserDto)
+        [HttpPut("TargetUserID")]
+        [Authorize]
+        public async Task<IActionResult> UpdateUser(Guid TargetUserID, [FromBody] UpdateUserDto updateUserDto)
         {
-            if (!IsUserAuthorized(id))
+            if (!IsUserAuthorized(TargetUserID))
             {
                 return Forbid(); // 403 Forbidden - Yetkiniz yok.
             }
-            var userToUpdate = await _context.Users.FindAsync(id);
+            var userToUpdate = await _context.Users.FindAsync(TargetUserID);
 
             if (userToUpdate == null)
             {
@@ -132,7 +132,7 @@ namespace ProjectApi.Controllers
 
         // --- Yardımcı Metotlar ---
 
-        private Guid GetCurrentUserId()
+        private Guid? GetCurrentUserId()
         {
             var userIdString = User.FindFirstValue(ClaimTypes.NameIdentifier);
             return Guid.Parse(userIdString!);
@@ -142,7 +142,7 @@ namespace ProjectApi.Controllers
         {
             var currentUserId = GetCurrentUserId();
             var currentUserRole = User.FindFirstValue(ClaimTypes.Role);
-
+            
             // Eğer işlem yapılan ID, giriş yapan kullanıcıya aitse VEYA kullanıcı Admin rolündeyse yetkilidir.
             return targetUserId == currentUserId || currentUserRole == "Admin";
         }

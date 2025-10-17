@@ -33,65 +33,45 @@ namespace ProjectAPI.Utils
             _securityKey = _config["Jwt:SecurityKey"]
                          ?? throw new InvalidOperationException("Jwt:SecurityKey ayarı bulunamadı.");
         }
+         private string CreateToken(User user)
+{
+    var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_securityKey));
+            var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
 
+            // JWT içine ekleyeceğimiz iddialar (claims)
+            var claims = new[]
+            {
+            // Kullanıcının benzersiz ID'si
+            new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
+            // Kullanıcının adı
+            new Claim(ClaimTypes.Name, user.UserName!),
+            // Zorunlu: E-posta
+            new Claim(ClaimTypes.Email, user.EMail),
+            new Claim(ClaimTypes.Role,user.isRole)
+        };
+
+            var token = new JwtSecurityToken(
+                issuer: _config["Jwt:Issuer"],
+                audience: _config["Jwt:Audience"],
+                claims: claims,
+                expires: DateTime.Now.AddHours(1), // Token 1 saat geçerli
+                signingCredentials: credentials);
+
+            // Token'ı string olarak döndür
+            return new JwtSecurityTokenHandler().WriteToken(token);
+}
         public async Task<string> GenerateToken(Guid UserID)
         {
-            var user = await _db.Users.FirstOrDefaultAsync(u => u.Id == UserID);
-            if (user == null)
-                return "<TokenYok>";
-            var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_securityKey));
-            var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
-
-            // JWT içine ekleyeceğimiz iddialar (claims)
-            var claims = new[]
-            {
-            // Kullanıcının benzersiz ID'si
-            new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
-            // Kullanıcının adı
-            new Claim(ClaimTypes.Name, user.UserName),
-            // Opsiyonel: E-posta
-            new Claim(ClaimTypes.Email, user.EMail),
-            // İleride Role bilgisi de eklenebilir
-            new Claim(ClaimTypes.Role,user.isRole)
-        };
-
-            var token = new JwtSecurityToken(
-                issuer: _config["Jwt:Issuer"],
-                audience: _config["Jwt:Audience"],
-                claims: claims,
-                expires: DateTime.Now.AddHours(1), // Token 1 saat geçerli
-                signingCredentials: credentials);
-
-            // Token'ı string olarak döndür
-            return new JwtSecurityTokenHandler().WriteToken(token);
+           var user = await _db.Users.FirstOrDefaultAsync(u => u.Id == UserID);
+    if (user == null)
+        throw new UnauthorizedAccessException();
+        
+    return CreateToken(user);
+            
         }
         public async Task<string> GenerateToken(User user)
-        {             
-            var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_securityKey));
-            var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
-
-            // JWT içine ekleyeceğimiz iddialar (claims)
-            var claims = new[]
-            {
-            // Kullanıcının benzersiz ID'si
-            new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
-            // Kullanıcının adı
-            new Claim(ClaimTypes.Name, user.UserName),
-            // Opsiyonel: E-posta
-            new Claim(ClaimTypes.Email, user.EMail),
-            // İleride Role bilgisi de eklenebilir
-            new Claim(ClaimTypes.Role,user.isRole)
-        };
-
-            var token = new JwtSecurityToken(
-                issuer: _config["Jwt:Issuer"],
-                audience: _config["Jwt:Audience"],
-                claims: claims,
-                expires: DateTime.Now.AddHours(1), // Token 1 saat geçerli
-                signingCredentials: credentials);
-
-            // Token'ı string olarak döndür
-            return new JwtSecurityTokenHandler().WriteToken(token);
+        {
+            return CreateToken(user);
         }
         public async Task<string> GenerateAndRefreshToken(Guid userid)
         {

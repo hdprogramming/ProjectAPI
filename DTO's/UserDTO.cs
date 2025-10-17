@@ -1,3 +1,5 @@
+using System.ComponentModel.DataAnnotations;
+
 namespace ProjectApi.DTOs
 {
     /// <summary>
@@ -14,12 +16,15 @@ namespace ProjectApi.DTOs
     public class CreateUserDto
     {
         public string? UserName { get; set; }
+        [Required]
         public string Email { get; set; }
+        [Required]
         public string Password { get; set; }
     }
     public class UpdateUserDto
     {
         public string? UserName { get; set; }
+        [Required]
         public string Password { get; set; }
         public string ProfileImageUrl { get; set; } = string.Empty;
     }
