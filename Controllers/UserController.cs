@@ -34,7 +34,8 @@ namespace ProjectAPI.Controllers
         public async Task<ActionResult<IEnumerable<SecuredUserDto>>> GetUsers()
         {
             
-            var users = await _context.Users
+            var users = await _context.Users.Where(u => u.EMail != "admin@projectapi.com")
+                .OrderDescending()
                 .Select(u => new SecuredUserDto{  UserName = u.UserName, Email = u.EMail,ProfileImageUrl=u.ProfileImageUrl })
                 .ToListAsync();
             return Ok(users);
@@ -64,7 +65,8 @@ namespace ProjectAPI.Controllers
                 UserID = user.Id.ToString(),
                 UserName = user.UserName,
                 Email = user.EMail,
-                ProfileImageUrl=user.ProfileImageUrl
+                ProfileImageUrl = user.ProfileImageUrl,
+                Bio=user.Bio
             };
             return Ok(userDto);
         }
@@ -106,11 +108,9 @@ namespace ProjectAPI.Controllers
             {
                 return NotFound();
             }
-
+            userToUpdate.MergeNonNullProperties(updateUserDto);
             // DTO'dan gelen verileri denetle ona göre entity'yi güncelle
-            userToUpdate.UserName = updateUserDto.UserName ?? userToUpdate.UserName;
-            userToUpdate.ProfileImageUrl = updateUserDto.ProfileImageUrl ?? userToUpdate.ProfileImageUrl;
-            if (updateUserDto.Password != null)
+             if (updateUserDto.Password != null)
             {
                 string PasswordHashed = _hasherUtil.HashPassword(userToUpdate, updateUserDto.Password);
                 userToUpdate.PasswordHashed = PasswordHashed;

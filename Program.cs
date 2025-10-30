@@ -10,12 +10,14 @@ using Microsoft.AspNetCore.Authentication.JwtBearer; // Authentication Middlewar
 using Microsoft.IdentityModel.Tokens;
 using ProjectAPI.Models;
 using ProjectAPI.Utils;
-using Microsoft.OpenApi.Models; 
+using Microsoft.OpenApi.Models;
+using Microsoft.Extensions.FileProviders;
 var builder = WebApplication.CreateBuilder(args);
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
                        ?? throw new InvalidOperationException("Bağlantı Dizisi 'DefaultConnection' bulunamadı.");
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(connectionString));
+builder.Services.AddTransient<IFileService, FileService>();
 builder.Services.AddSingleton<IPasswordHasher<User>, HasherUtil>();
 builder.Services.AddScoped<IJwtService, JwtService>();
 builder.Services.AddEndpointsApiExplorer();
@@ -56,14 +58,16 @@ builder.Services.AddSwaggerGen(c =>
 });
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("AllowAll",
-        builder =>
-        {
-            builder.AllowAnyOrigin()
-                   .AllowAnyMethod()
-                   .AllowAnyHeader();                   
-        });
+    options.AddPolicy(name: "MyAllowSpecificOrigins",
+         policy =>
+         {
+             policy.WithOrigins("http://localhost:5173") // 👈 BURAYI DÜZELT: React uygulamanın TAM adresi
+                   .AllowAnyHeader()                     // İzin verilen HTTP başlıkları
+                   .AllowAnyMethod()                     // İzin verilen HTTP metotları (GET, POST, vb.)
+                   .AllowCredentials();                  // 👈 KRİTİK AYAR: Çerezlerin (Cookies) gönderilmesine izin ver!
+         });
 });
+
 var jwtSection = builder.Configuration.GetSection("Jwt");
 var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSection["SecurityKey"]!));
 
@@ -96,8 +100,15 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
+app.UseStaticFiles(new StaticFileOptions
+{
+    FileProvider = new PhysicalFileProvider(
+           Path.Combine(builder.Environment.ContentRootPath, "Uploads")),
+    RequestPath = "/Uploads"
+});
 app.UseHttpsRedirection();
-app.UseCors("AllowAll");
+app.UseCors("MyAllowSpecificOrigins");
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();

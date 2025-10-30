@@ -18,6 +18,7 @@ namespace ProjectAPI.DTOs
         public string? UserName { get; set; }
         public string? Email { get; set; }
         public string ProfileImageUrl { get; set; } = string.Empty;
+         public string Bio { get; set; } = string.Empty;
     }
     public class CreateUserDto
     {
@@ -26,6 +27,7 @@ namespace ProjectAPI.DTOs
         public string Email { get; set; }
         [Required]
         public string Password { get; set; }
+        public string Bio { get; set; } = string.Empty;
     }
     public class UpdateUserDto
     {
@@ -33,6 +35,7 @@ namespace ProjectAPI.DTOs
         
         public string? Password { get; set; }
         public string? ProfileImageUrl { get; set; } 
+         public string Bio { get; set; } = string.Empty;
     }
     public class UserDTODetails
     {
@@ -40,5 +43,6 @@ namespace ProjectAPI.DTOs
          public string? UserName { get; set; }
         public string? Email { get; set; }
         public string ProfileImageUrl { get; set; } = string.Empty;
+        public string Bio { get; set; } = string.Empty;
     }
 }

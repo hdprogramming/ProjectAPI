@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Identity; // IPasswordHasher için
 using ProjectAPI.DTOs;
 using ProjectAPI.Models;
 using ProjectAPI.Utils;
+using System.Net;
 
 
 // using ProjectApi.Services; // IJwtService'in olduğu namespace
@@ -78,22 +79,48 @@ namespace ProjectAPI.Controllers
             }
 
             var token = await _jwtService.GenerateToken(user);
-            var RefreshToken = await _jwtService.GenerateAndRefreshToken(user.Id);
+            var refreshToken = await _jwtService.GenerateAndRefreshToken(user.Id); // Bu Refresh Token
 
-            return Ok(new { UserID=user.Id,Token = token, refreshToken = RefreshToken });
+            // 2. Refresh Token'ı GÜVENLİ Cookie olarak ayarla
+            var cookieOptions = new CookieOptions
+            {
+                HttpOnly = true, // KRİTİK: JavaScript erişimini engeller (XSS koruması)
+                Secure = true,   // ÖNERİLİR: Yalnızca HTTPS üzerinden gönderilir (MITM koruması)
+                SameSite = SameSiteMode.Strict, // ÖNERİLİR: CSRF riskini azaltır
+                Expires = DateTimeOffset.UtcNow.AddDays(7) // Cookie geçerlilik süresi
+            };
+            HttpContext.Response.Cookies.Append("refreshToken", refreshToken, cookieOptions);
+
+            return Ok(new { UserID=user.Id,Token = token });
         }
         [HttpPost("Refresh")]
-        public async Task<IActionResult> Refresh(RefreshTokenDto refreshTokenDto)
+        public async Task<IActionResult> Refresh()
         {
-            if (refreshTokenDto.Token == null)
-                return BadRequest("Token göndermelisiniz");
+            var cookies = HttpContext.Request.Cookies;            
+            string RefreshToken="";
+            if (cookies.TryGetValue("refreshToken", out string refreshTokenValue))
+            {
+                RefreshToken = refreshTokenValue;
+            }
+            else
+                return BadRequest("Refresh Token göndermelisiniz");
 
-            Guid? UserID= await _jwtService.ValidateAndInvalidateRefreshToken(refreshTokenDto.Token);
+            Guid? UserID= await _jwtService.ValidateRefreshToken(RefreshToken);
             if (UserID == null)
                 return BadRequest("Tokenin Süresi Dolmuş");
+            
             var NewRefreshToken = await _jwtService.GenerateAndRefreshToken(UserID.Value);
-            var NewToken = _jwtService.GenerateToken(UserID.Value);
-            return Ok(new { Token=NewToken,refreshToken = NewRefreshToken });
+            string NewToken = await _jwtService.GenerateToken(UserID.Value);
+            var cookieOptions = new CookieOptions
+            {
+                HttpOnly = true, // KRİTİK: JavaScript erişimini engeller (XSS koruması)
+                Secure = true,   // ÖNERİLİR: Yalnızca HTTPS üzerinden gönderilir (MITM koruması)
+                SameSite = SameSiteMode.Strict, // ÖNERİLİR: CSRF riskini azaltır
+                Expires = DateTimeOffset.UtcNow.AddDays(7) // Cookie geçerlilik süresi
+            };
+            HttpContext.Response.Cookies.Append("refreshToken", NewRefreshToken, cookieOptions);
+            
+            return Ok(new { Token=NewToken});
         } 
 
     }

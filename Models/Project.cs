@@ -10,14 +10,18 @@ namespace ProjectAPI.Models
         public int Id { get; set; }
         public Guid UserId{ get; set; }
 
-        public string IconName { get; set; } = "None";
+        public string Icon { get; set; } = "None";
         [Required]
-        public string Name { get; set; }
+        public string Title { get; set; }
         public string Description { get; set; } = string.Empty;
         public string Content { get; set; } = string.Empty;
         public bool isAlive { get; set; } = true;
-        public string Status { get; set; } = string.Empty;
-        public DateTime StartingDate { get; set; }
+        public int StatusId { get; set; }  
+        public DateOnly StartingDate { get; set; }
+        public DateTime LastModificationDate { get; set; } = DateTime.UtcNow;
         public User user { get; set; } = null!;
+        public ProjectStatusMsg? Status { get; set; }
+        public ICollection<ProjectCategory> ProjectCategories { get; set; }
+     public ICollection<UploadFile> Files { get; set; } = new List<UploadFile>();
     }
 }

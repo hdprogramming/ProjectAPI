@@ -11,9 +11,11 @@ namespace ProjectAPI.Models
 
         // Kullanıcı Adı (Örn: "admin", "tester")
         public string? UserName { get; set; } = string.Empty;
+        public string Bio { get; set; } = string.Empty;
         public string PasswordHashed { get; set; } = string.Empty;
         public string isRole { get; set; } = "User";
-        public ICollection<Project> Projects=new List<Project>();
+        public ICollection<Project> Projects = new List<Project>();
+        public ICollection<UploadFile> uploadFiles = new List<UploadFile>();
         // Navigasyon Özelliği (Navigation Property)
         // Bu kullanıcı tarafından eklenen tüm projeleri tutar. 
         // EF Core, bu koleksiyonu otomatik olarak doldurabilir.

@@ -15,7 +15,7 @@ namespace ProjectAPI.Utils
         Task<string> GenerateToken(Guid UserID);
         Task<string> GenerateToken(User user);
         Task<string> GenerateAndRefreshToken(Guid userid);
-        Task<Guid?> ValidateAndInvalidateRefreshToken(string token);
+        Task<Guid?> ValidateRefreshToken(string token);
     }
 
     public class JwtService : IJwtService
@@ -23,19 +23,19 @@ namespace ProjectAPI.Utils
         private readonly IConfiguration _config;
         private readonly AppDbContext _db;
         private readonly string _securityKey;
-        
 
-        public JwtService(IConfiguration config,AppDbContext appdbcontext)
+
+        public JwtService(IConfiguration config, AppDbContext appdbcontext)
         {
             _config = config;
-            _db= appdbcontext;
+            _db = appdbcontext;
             // appsettings.json dosyasından Gizli Anahtarı okur
             _securityKey = _config["Jwt:SecurityKey"]
                          ?? throw new InvalidOperationException("Jwt:SecurityKey ayarı bulunamadı.");
         }
-         private string CreateToken(User user)
-{
-    var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_securityKey));
+        private string CreateToken(User user)
+        {
+            var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_securityKey));
             var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
 
             // JWT içine ekleyeceğimiz iddialar (claims)
@@ -59,15 +59,15 @@ namespace ProjectAPI.Utils
 
             // Token'ı string olarak döndür
             return new JwtSecurityTokenHandler().WriteToken(token);
-}
+        }
         public async Task<string> GenerateToken(Guid UserID)
         {
-           var user = await _db.Users.FirstOrDefaultAsync(u => u.Id == UserID);
-    if (user == null)
-        throw new UnauthorizedAccessException();
-        
-    return CreateToken(user);
-            
+            var user = await _db.Users.FirstOrDefaultAsync(u => u.Id == UserID);
+            if (user == null)
+                throw new UnauthorizedAccessException();
+
+            return CreateToken(user);
+
         }
         public async Task<string> GenerateToken(User user)
         {
@@ -75,43 +75,38 @@ namespace ProjectAPI.Utils
         }
         public async Task<string> GenerateAndRefreshToken(Guid userid)
         {
-            string RefreshToken = Convert.ToBase64String(RandomNumberGenerator.GetBytes(32));
+            byte[] randomBytes = RandomNumberGenerator.GetBytes(32);
+            string RefreshToken = String.Concat(randomBytes.Select(b => b.ToString("x2")));
             var RefReshTokenObj = new RefreshToken
             {
                 id = Guid.NewGuid(),
                 UserID = userid,
                 Token = RefreshToken,
-                ExpiresOnUtc = DateTime.UtcNow.AddMinutes(10)
+                ExpiresOnUtc = DateTime.UtcNow.AddDays(7)
             };
+            var excitingToken = _db.RefreshTokens.FirstOrDefault(rt => rt.UserID == userid);
+            if (excitingToken != null)
+            {
+                excitingToken.IsRevoked = true;
+                _db.RefreshTokens.Update(excitingToken);                
+            }
             _db.RefreshTokens.Add(RefReshTokenObj);
             await _db.SaveChangesAsync();
             return RefreshToken;
         }
-        public async Task<Guid?> ValidateAndInvalidateRefreshToken(string token)
+        public async Task<Guid?> ValidateRefreshToken(string token)
         {
-            var existingToken = await _db.RefreshTokens.FirstOrDefaultAsync(rt => rt.Token == token);           
+            var existingToken = await _db.RefreshTokens.FirstOrDefaultAsync(rt => rt.Token == token);
 
             // 1. Durum: Token veritabanında yoksa veya iptal edilmişse (IsRevoked)
-            if (existingToken == null )
+            if (existingToken == null)
             {
                 return null;
             }
-
-            // 2. Durum: Token'ın süresi dolmuşsa
             if (existingToken.ExpiresOnUtc < DateTime.UtcNow || existingToken.IsRevoked)
             {
-                // Süresi dolan token'ı temizlik için veritabanından silebiliriz.
-                // _db.RefreshTokens.Remove(existingToken);
-                // await _db.SaveChangesAsync();
                 return null;
             }
-
-            // 3. Durum: Başarılı Doğrulama - Token'ı iptal et (Tek kullanımlık kuralı)
-            existingToken.IsRevoked = true;
-            _db.RefreshTokens.Update(existingToken);
-            await _db.SaveChangesAsync();
-
-            // Başarılı: Yeni Access Token oluşturmak için kullanıcıyı döndür
             return existingToken.UserID;
         }
     }
