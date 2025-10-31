@@ -241,7 +241,7 @@ namespace ProjectAPI.Controllers
             existingProject.Content = projectUpdate.content ?? existingProject.Content;
             existingProject.isAlive = projectUpdate.isAlive ?? existingProject.isAlive;
             existingProject.StatusId = projectUpdate.statusID ?? existingProject.StatusId;
-            existingProject.LastModificationDate = DateTime.UtcNow;
+            existingProject.LastModificationDate = DateTime.UtcNow;            
             // existingProject.UserId ve StartingDate'e dokunmuyoruz.
 
             try

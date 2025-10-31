@@ -7,6 +7,7 @@ namespace ProjectAPI.DTOs
    public class UploadImageDTO
     {
         public string? name { get; set; }
-        public IFormFile? image{ get; set; }
+        public IFormFile? image { get; set; }
+        public string? ProjectID { get; set; }
     } 
 }

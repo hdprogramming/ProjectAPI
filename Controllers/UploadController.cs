@@ -18,56 +18,83 @@ namespace ProjectAPI.Controllers
     public class UploadsController : ControllerBase
     {
         private readonly AppDbContext _context;
-              private readonly IFileService _fileService;
+        private readonly IFileService _fileService;
         // Constructor'ı kendi servislerinle güncelle (IJwtService)
-        public UploadsController(AppDbContext context,  IFileService fileService)
+        public UploadsController(AppDbContext context, IFileService fileService)
         {
             _context = context;
             _fileService = fileService;
         }
         // POST: api/Upload/Image
         [HttpPost("Image")]
-        [Authorize] 
+        [Authorize]
         public async Task<IActionResult> UploadImage([FromForm] UploadImageDTO uploadImage)
         {
             var userIdString = User.FindFirstValue(ClaimTypes.NameIdentifier);
             if (string.IsNullOrEmpty(userIdString))
-        {
-            // Token geçerli ama içinde ID yoksa (anormal bir durum)
-            return Unauthorized("Kullanıcı kimliği token içinde bulunamadı.");
-        }
-        
-        if (!Guid.TryParse(userIdString, out Guid userGuid))
-        {
-            // Token'daki ID, Guid formatında değilse (hata)
-            return BadRequest("Geçersiz kullanıcı kimliği formatı.");
-        }
-          try
-          {
-             if (uploadImage.image?.Length > 3 * 1024 * 1024)
             {
-                return StatusCode(StatusCodes.Status400BadRequest, "File size should not exceed 3 MB");
+                // Token geçerli ama içinde ID yoksa (anormal bir durum)
+                return Unauthorized("Kullanıcı kimliği token içinde bulunamadı.");
             }
+
+            if (!Guid.TryParse(userIdString, out Guid userGuid))
+            {
+                // Token'daki ID, Guid formatında değilse (hata)
+                return BadRequest("Geçersiz kullanıcı kimliği formatı.");
+            }
+            try
+            {
+                if (uploadImage.image?.Length > 3 * 1024 * 1024)
+                {
+                    return StatusCode(StatusCodes.Status400BadRequest, "File size should not exceed 3 MB");
+                }
                 string[] allowedFileExtentions = [".jpg", ".jpeg", ".png"];
                 if (uploadImage.image == null)
                     return BadRequest("Image eklenmemiş");
                 string createdImageName = await _fileService.SaveFileAsync(uploadImage.image, allowedFileExtentions);
                 var fileUrl = $"/Uploads/{createdImageName}";
-            var newFileRecord = new UploadFile
-        {
-            name = createdImageName, // Veya orijinal dosya adı, size kalmış
-            // Burası en önemli kısım!
-            UserId = userGuid 
-        };
-                _context.UploadFiles.Add(newFileRecord); 
-        //
-        await _context.SaveChangesAsync();
-            return Ok(new { url = fileUrl });
-          }
-          catch (System.Exception error)
-          {
-                return BadRequest(error.Message);            
-          }
+                var newFileRecord = new UploadFile
+                {
+                    name = uploadImage.name ?? createdImageName,
+                    filename = createdImageName, // Veya orijinal dosya adı, size kalmış
+                                                 // Burası en önemli kısım!
+                    UserId = userGuid
+                };
+                //Eğer projede kullanıldıysa o projede kullanılan dosyaların takibi için
+                // Eğer bir proje ID'si geldiyse, N-N ilişkiyi kur
+                if (uploadImage.ProjectID != null)
+                {
+                    // 1. Proje ID'sini güvenle parse et
+                    if (!int.TryParse(uploadImage.ProjectID.ToString(), out int projectId))
+                    {
+                        return BadRequest("ProjectID sayı olmalı");
+                    }
+
+                    // 2. Projeyi GÜVENLE bul (FirstAsync YERİNE)
+                    var project = await _context.Projects
+                                                .FirstOrDefaultAsync(p => p.Id == projectId);
+
+                    // 3. Projenin var olup olmadığını KONTROL ET
+                    if (project == null)
+                    {
+
+                        return BadRequest($"ID'si {projectId} olan proje bulunamadı.");
+
+                    }
+                    else
+                    {
+                        project.Files.Add(newFileRecord);
+                    }
+                }
+                _context.UploadFiles.Add(newFileRecord);
+                //
+                await _context.SaveChangesAsync();
+                return Ok(new { url = fileUrl });
+            }
+            catch (System.Exception error)
+            {
+                return BadRequest(error.Message);
+            }
         }
     }
 }
