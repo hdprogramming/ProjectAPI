@@ -35,7 +35,7 @@ namespace ProjectAPI.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("categories");
+                    b.ToTable("categories", (string)null);
 
                     b.HasData(
                         new
@@ -120,7 +120,7 @@ namespace ProjectAPI.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Projects");
+                    b.ToTable("Projects", (string)null);
                 });
 
             modelBuilder.Entity("ProjectAPI.Models.ProjectCategory", b =>
@@ -135,7 +135,7 @@ namespace ProjectAPI.Migrations
 
                     b.HasIndex("CategoryId");
 
-                    b.ToTable("projectCategories");
+                    b.ToTable("projectCategories", (string)null);
                 });
 
             modelBuilder.Entity("ProjectAPI.Models.ProjectStatusMsg", b =>
@@ -152,7 +152,7 @@ namespace ProjectAPI.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("projectStatusMsgs");
+                    b.ToTable("projectStatusMsgs", (string)null);
 
                     b.HasData(
                         new
@@ -200,7 +200,7 @@ namespace ProjectAPI.Migrations
 
                     b.HasIndex("UserID");
 
-                    b.ToTable("RefreshTokens");
+                    b.ToTable("RefreshTokens", (string)null);
                 });
 
             modelBuilder.Entity("ProjectAPI.Models.UploadFile", b =>
@@ -224,7 +224,7 @@ namespace ProjectAPI.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("UploadFiles");
+                    b.ToTable("UploadFiles", (string)null);
                 });
 
             modelBuilder.Entity("ProjectAPI.Models.User", b =>
@@ -261,7 +261,7 @@ namespace ProjectAPI.Migrations
                     b.HasIndex("EMail")
                         .IsUnique();
 
-                    b.ToTable("Users");
+                    b.ToTable("Users", (string)null);
 
                     b.HasData(
                         new

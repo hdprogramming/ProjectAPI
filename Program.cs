@@ -12,6 +12,7 @@ using ProjectAPI.Models;
 using ProjectAPI.Utils;
 using Microsoft.OpenApi.Models;
 using Microsoft.Extensions.FileProviders;
+using Microsoft.AspNetCore.HttpOverrides;
 var builder = WebApplication.CreateBuilder(args);
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
                        ?? throw new InvalidOperationException("Bağlantı Dizisi 'DefaultConnection' bulunamadı.");
@@ -89,11 +90,15 @@ builder.Services.AddAuthentication(options =>
         IssuerSigningKey = securityKey
     };
 });
-
+builder.Services.Configure<ForwardedHeadersOptions>(options =>
+{
+    options.ForwardedHeaders = 
+        ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
+});
 // Authorization servisini ekle
 builder.Services.AddAuthorization();
 var app = builder.Build();
-
+app.UseForwardedHeaders();
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {

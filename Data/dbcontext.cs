@@ -10,14 +10,14 @@ public class AppDbContext : DbContext
     }
 
     // DbSet: Veritabanındaki 'Urunler' tablosuna karşılık gelir.
-   
-     public DbSet<User> Users { get; set; }
-     public DbSet<Project> Projects { get; set; }
-     public DbSet<UploadFile> UploadFiles{ get; set; }
-     public DbSet<RefreshToken> RefreshTokens { get; set; }
-     public DbSet<ProjectStatusMsg> projectStatusMsgs { get; set; }
-     public DbSet<Category> categories { get; set; }
-      public DbSet<ProjectCategory> projectCategories { get; set; }
+
+    public DbSet<User> Users { get; set; }
+    public DbSet<Project> Projects { get; set; }
+    public DbSet<UploadFile> UploadFiles { get; set; }
+    public DbSet<RefreshToken> RefreshTokens { get; set; }
+    public DbSet<ProjectStatusMsg> projectStatusMsgs { get; set; }
+    public DbSet<Category> categories { get; set; }
+    public DbSet<ProjectCategory> projectCategories { get; set; }
     // İlişkileri ve kısıtlamaları yapılandırmak istersen bu metodu kullanırsın.
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -26,6 +26,8 @@ public class AppDbContext : DbContext
         modelBuilder.Entity<User>()
        .HasIndex(u => u.EMail)
        .IsUnique(); // E-posta alanının benzersiz olmasını zorunlu kılar.
+       
+     
         modelBuilder.Entity<Project>()
             .HasOne(p => p.user)
             .WithMany(u => u.Projects)
@@ -35,9 +37,9 @@ public class AppDbContext : DbContext
             .WithMany(u => u.uploadFiles) // User'ın ise birçok 'uploadFiles'ı var
             .HasForeignKey(uf => uf.UserId) // 'UploadFiles' üzerindeki yabancı anahtar 'UserId'dir
             .OnDelete(DeleteBehavior.Restrict); // ÖNEMLİ: Bir User silinmeye çalışılırsa 
-                                                    // ama hala yüklediği dosyaları varsa,
-                                                    // veritabanı bu silme işlemini engeller.
-                                                    // (Eğer 'Cascade' yapsaydınız, user silinince tüm dosyaları da silinirdi)
+                                                // ama hala yüklediği dosyaları varsa,
+                                                // veritabanı bu silme işlemini engeller.
+                                                // (Eğer 'Cascade' yapsaydınız, user silinince tüm dosyaları da silinirdi)
         modelBuilder.Entity<Project>()
                 .HasMany(p => p.Files) // Project'in birçok 'Files'ı var
                 .WithMany(uf => uf.Projects) // UploadFiles'ın da birçok 'Projects'i var
@@ -77,14 +79,14 @@ public class AppDbContext : DbContext
 
         // 5. HasData metodu ile veritabanı oluşturulurken bu veriyi eklemesini söylüyoruz.
         modelBuilder.Entity<User>().HasData(adminUser);
-        
+
         // Proje ve Statü arasındaki ilişkiyi de burada tanımlayabilirsiniz (Fluent API)
         modelBuilder.Entity<Project>()
     .HasOne(p => p.Status)
     .WithMany()
     .HasForeignKey(p => p.StatusId);                   // Statüye ait birden çok proje olabilir
-            // İlişkiyi StatusId üzerinden kur.
-        
+                                                       // İlişkiyi StatusId üzerinden kur.
+
         modelBuilder.Entity<ProjectCategory>()
         .HasKey(pc => new { pc.ProjectId, pc.CategoryId });
 
@@ -93,7 +95,7 @@ public class AppDbContext : DbContext
             .HasOne(pc => pc.Project)
             .WithMany(p => p.ProjectCategories)
             .HasForeignKey(pc => pc.ProjectId);
-        
+
         modelBuilder.Entity<ProjectCategory>()
             .HasOne(pc => pc.Category)
             .WithMany(c => c.ProjectCategories)
@@ -106,14 +108,14 @@ public class AppDbContext : DbContext
       new Category { Id = 5, Name = "Katıhal Fiziği" },
       new Category { Id = 6, Name = "Elektrokimya" },
       new Category { Id = 7, Name = "Kuantum Fiziği" });
-       // İhtiyaca göre ekleyebilirsiniz
+        // İhtiyaca göre ekleyebilirsiniz
         modelBuilder.Entity<ProjectStatusMsg>().HasData(
             new ProjectStatusMsg { Id = 1, Name = "Başlangıç Aşamasında" },
             new ProjectStatusMsg { Id = 2, Name = "Devam Ediyor" },
             new ProjectStatusMsg { Id = 3, Name = "Test Aşamasında" },
             new ProjectStatusMsg { Id = 4, Name = "Tamamlandı" } // İhtiyaca göre ekleyebilirsiniz
         );
-       
+
     }
-    
+
 }

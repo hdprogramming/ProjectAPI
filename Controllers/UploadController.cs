@@ -8,6 +8,8 @@ using ProjectAPI.Utils;
 using System.Net;
 using System.Security.Claims; // Bu using satırı önemli!
 using System;
+using Microsoft.VisualBasic;
+using Microsoft.EntityFrameworkCore.ChangeTracking.Internal;
 
 // using ProjectApi.Services; // IJwtService'in olduğu namespace
 
@@ -95,6 +97,72 @@ namespace ProjectAPI.Controllers
             {
                 return BadRequest(error.Message);
             }
+        }
+        [HttpGet("MyFiles")]
+        [Authorize]
+        public async Task<IActionResult> MyFiles()
+        {
+            var userIdString = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (string.IsNullOrEmpty(userIdString))
+            {
+                // Token geçerli ama içinde ID yoksa (anormal bir durum)
+                return Unauthorized("Kullanıcı kimliği token içinde bulunamadı.");
+            }
+
+            if (!Guid.TryParse(userIdString, out Guid userGuid))
+            {
+                // Token'daki ID, Guid formatında değilse (hata)
+                return BadRequest("Geçersiz kullanıcı kimliği formatı.");
+            }
+            try
+            {
+                var userWithfiles = await _context.Users.Include(user => user.uploadFiles).FirstOrDefaultAsync(u => u.Id == userGuid);
+                if (userWithfiles == null)
+                {
+                    return NoContent();
+                }
+                else
+                {
+                    List<UploadedFilesDTO> founded = new List<UploadedFilesDTO>();
+                    var scheme = HttpContext.Request.Scheme;   // "http" veya "https://
+                    var host = HttpContext.Request.Host.Value; // "localhost:5001" veya "api.siteniz.com"
+
+                    // Eğer uygulamanız bir alt dizin üzerinden yayın yapıyorsa (örn: /api)
+                    var pathBase = HttpContext.Request.PathBase.Value; // "/api" veya ""
+
+                    // Tam adres (PathBase'i de ekleyerek)
+                    var baseUrl = $"{scheme}://{host}{pathBase}";
+                    foreach (UploadFile u in userWithfiles.uploadFiles)
+                    {
+                        founded.Add(new UploadedFilesDTO
+                        {
+                            id=u.Id,
+                            name = u.name,
+                            url = $"{baseUrl}/Uploads/{u.filename}"
+                        });
+                    }
+                    return Ok(founded);
+                }
+            }
+            catch (Exception error)
+            {
+                return BadRequest(error.Message);
+            }
+
+        }
+        [HttpDelete("Delete/{id}")]
+        [Authorize]
+        public async Task<IActionResult> DeleteFile(int id)
+        {
+            var founded = await _context.UploadFiles.FirstOrDefaultAsync(f => f.Id == id);
+            if (founded == null)
+                return NoContent();
+            
+            if (founded.filename != null)
+                _fileService.DeleteFile(founded.filename);
+            _context.UploadFiles.Remove(founded);
+            await _context.SaveChangesAsync();
+            return Ok("Dosya silindi");
         }
     }
 }
