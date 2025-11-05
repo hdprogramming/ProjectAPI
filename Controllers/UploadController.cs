@@ -10,6 +10,8 @@ using System.Security.Claims; // Bu using satırı önemli!
 using System;
 using Microsoft.VisualBasic;
 using Microsoft.EntityFrameworkCore.ChangeTracking.Internal;
+using System.Diagnostics.Eventing.Reader;
+using Microsoft.AspNetCore.RateLimiting;
 
 // using ProjectApi.Services; // IJwtService'in olduğu namespace
 
@@ -30,6 +32,7 @@ namespace ProjectAPI.Controllers
         // POST: api/Upload/Image
         [HttpPost("Image")]
         [Authorize]
+       [EnableRateLimiting("PerSecondLimit")]
         public async Task<IActionResult> UploadImage([FromForm] UploadImageDTO uploadImage)
         {
             var userIdString = User.FindFirstValue(ClaimTypes.NameIdentifier);
@@ -119,7 +122,7 @@ namespace ProjectAPI.Controllers
                 var userWithfiles = await _context.Users.Include(user => user.uploadFiles).FirstOrDefaultAsync(u => u.Id == userGuid);
                 if (userWithfiles == null)
                 {
-                    return NoContent();
+                    return NotFound();
                 }
                 else
                 {
@@ -136,7 +139,7 @@ namespace ProjectAPI.Controllers
                     {
                         founded.Add(new UploadedFilesDTO
                         {
-                            id=u.Id,
+                            id = u.Id,
                             name = u.name,
                             url = $"{baseUrl}/Uploads/{u.filename}"
                         });
@@ -150,13 +153,31 @@ namespace ProjectAPI.Controllers
             }
 
         }
+        [HttpPut("Update/{id}")]
+        [Authorize]
+         [EnableRateLimiting("PerSecondLimit")]
+        public async Task<IActionResult> ModifyFile(int id,UploadModDTO uploadModDTO)
+        {
+            var foundedfile = await _context.UploadFiles.FirstAsync(up => up.Id == id);
+            if (foundedfile == null)
+                return NotFound();
+            if (uploadModDTO.name != null)
+            {
+                foundedfile.name = uploadModDTO.name;
+                _context.UploadFiles.Update(foundedfile);
+                await _context.SaveChangesAsync();
+                 return Ok(new{name=uploadModDTO.name});
+            }
+            return Ok("Değişiklik yok");
+        }
         [HttpDelete("Delete/{id}")]
         [Authorize]
+         [EnableRateLimiting("PerSecondLimit")]
         public async Task<IActionResult> DeleteFile(int id)
         {
             var founded = await _context.UploadFiles.FirstOrDefaultAsync(f => f.Id == id);
             if (founded == null)
-                return NoContent();
+                return NotFound();
             
             if (founded.filename != null)
                 _fileService.DeleteFile(founded.filename);

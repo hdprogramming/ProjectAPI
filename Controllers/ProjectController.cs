@@ -57,31 +57,31 @@ namespace ProjectAPI.Controllers
         {
             var projects = await _context.Projects
         // 1. Status Bilgisini Yükle
-         
+
         .Include(p => p.ProjectCategories)
-        .Include(p=>p.Status).OrderDescending()
+        .Include(p => p.Status).OrderDescending()
             .Select(p => new ProjectDto
-    {
-        // Temel Alanlar
-        id = p.Id,
-        title = p.Title,
-        icon = p.Icon,
-        description = p.Description,
-        content = p.Content,
-        isAlive = p.isAlive,
-        date = p.StartingDate,
-        lastdate=p.LastModificationDate,
-        // İlişkili Tekil Alan (Status)
-        // Varsayım: En son Status (Durum) mesajının içeriğini Status olarak alıyoruz.
-        // Mesajları tarihe göre sıralayıp en yenisinin içeriğini almalıyız.
-        status = p.Status.Name             // Mesaj içeriğini seç
+            {
+                // Temel Alanlar
+                id = p.Id,
+                title = p.Title,
+                icon = p.Icon,
+                description = p.Description,
+                content = p.Content,
+                isAlive = p.isAlive,
+                date = p.StartingDate,
+                lastdate = p.LastModificationDate,
+                // İlişkili Tekil Alan (Status)
+                // Varsayım: En son Status (Durum) mesajının içeriğini Status olarak alıyoruz.
+                // Mesajları tarihe göre sıralayıp en yenisinin içeriğini almalıyız.
+                status = p.Status.Name             // Mesaj içeriğini seç
             ,                   // İlk (en yeni) mesaj içeriğini al (yoksa null)
-         statusID=p.Status.Id,
-        // İlişkili Liste Alanı (CategoryIds)
-        
-        categoryIds = p.ProjectCategories
+                statusID = p.Status.Id,
+                // İlişkili Liste Alanı (CategoryIds)
+
+                categoryIds = p.ProjectCategories
             .Select(pc => pc.Category.Id).ToList()
-    })
+            })
     .ToListAsync();
             // Doğrudan List<ProjectDto> dönüyoruz
             return Ok(projects);
@@ -105,21 +105,21 @@ namespace ProjectAPI.Controllers
         content = p.Content,
         isAlive = p.isAlive,
         date = p.StartingDate,
-        lastdate=p.LastModificationDate,
-        status = p.Status.Name, 
-         statusID=p.Status.Id,
+        lastdate = p.LastModificationDate,
+        status = p.Status.Name,
+        statusID = p.Status.Id,
         // İlişkili Liste Alanı (CategoryIds)
         categoryIds = p.ProjectCategories
             .Select(pc => pc.Category.Id)
             .ToList()
     })
     .FirstOrDefaultAsync();
-            
+
             if (p == null)
             {
                 return NotFound();
             }
-                       // Doğrudan ProjectDto objesini dönüyoruz
+            // Doğrudan ProjectDto objesini dönüyoruz
             return Ok(p);
         }
 
@@ -151,7 +151,7 @@ namespace ProjectAPI.Controllers
                 isAlive = projectDto.isAlive,
                 UserId = currentUserId.Value, // Güvenlik: Token'dan gelen ID kullanılır
                 StartingDate = DateOnly.FromDateTime(DateTime.UtcNow),
-                StatusId=projectDto.statusID!.Value,
+                StatusId = projectDto.statusID!.Value,
                 ProjectCategories = new List<ProjectCategory>()
             };
             foreach (var category in existingCategories)
@@ -200,7 +200,7 @@ namespace ProjectAPI.Controllers
             {
                 return Forbid();
             }
-            if (projectUpdate.categoryIds != null)
+            if (projectUpdate.categoryIds != null && projectUpdate.categoryIds.Count>0)
             {
                 var existingCategories = await _context.categories
             .Where(c => projectUpdate.categoryIds.Contains(c.Id))
@@ -210,28 +210,28 @@ namespace ProjectAPI.Controllers
                     return BadRequest("Seçilen bazı kategori ID'leri geçersizdir.");
                 }
                 // 2. DÜZELTME: Eski ilişkileri veritabanından silmek için EF Core'a bildir
-        // Bu, veritabanında DELETE sorgusunu tetikleyecektir.
+                // Bu, veritabanında DELETE sorgusunu tetikleyecektir.
                 // KRİTİK DÜZELTME: RemoveRange çağrılmadan önce null kontrolü yapılmalı
-    if (existingProject.ProjectCategories != null)
-    {
+                if (existingProject.ProjectCategories != null)
+                {
                     // Eski ilişkileri veritabanından silmek için EF Core'a bildir
                     // Bu, veritabanında DELETE sorgusunu tetikleyecektir.
                     _context.projectCategories.RemoveRange(existingProject.ProjectCategories);
-       
-    }
-    
-    // Yeni liste oluştur (Veritabanındaki eski kayıtlar silinmek üzere işaretlendi)
-    existingProject.ProjectCategories = new List<ProjectCategory>();
-    
-    // Yeni ilişkileri ekle
-    foreach (var categoryId in projectUpdate.categoryIds.Distinct())
-    {
-        existingProject.ProjectCategories.Add(new ProjectCategory
-        {
-            ProjectId = existingProject.Id, 
-            CategoryId = categoryId       
-        });
-    }
+
+                }
+
+                // Yeni liste oluştur (Veritabanındaki eski kayıtlar silinmek üzere işaretlendi)
+                existingProject.ProjectCategories = new List<ProjectCategory>();
+
+                // Yeni ilişkileri ekle
+                foreach (var categoryId in projectUpdate.categoryIds.Distinct())
+                {
+                    existingProject.ProjectCategories.Add(new ProjectCategory
+                    {
+                        ProjectId = existingProject.Id,
+                        CategoryId = categoryId
+                    });
+                }
             }
             // Güncelleme alanlarını eşle
 
@@ -241,7 +241,7 @@ namespace ProjectAPI.Controllers
             existingProject.Content = projectUpdate.content ?? existingProject.Content;
             existingProject.isAlive = projectUpdate.isAlive ?? existingProject.isAlive;
             existingProject.StatusId = projectUpdate.statusID ?? existingProject.StatusId;
-            existingProject.LastModificationDate = DateTime.UtcNow;            
+            existingProject.LastModificationDate = DateTime.UtcNow;
             // existingProject.UserId ve StartingDate'e dokunmuyoruz.
 
             try

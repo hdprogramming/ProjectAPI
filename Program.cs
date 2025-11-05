@@ -13,11 +13,40 @@ using ProjectAPI.Utils;
 using Microsoft.OpenApi.Models;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.AspNetCore.HttpOverrides;
+using System.Threading.RateLimiting;
+
 var builder = WebApplication.CreateBuilder(args);
+// Rate Limiting Servislerini Ekleme
+builder.Services.AddRateLimiter(options =>
+{
+    // *** 1. HATA DURUMUNU BELİRLEME ***
+    options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
+
+    // *** 2. LİMİTLEME POLİTİKASINI TANIMLAMA VE UYGULAMA ***
+    // Burada "PerSecondLimit" adında, IP adresine göre çalışan bir politika tanımlıyoruz.
+    options.AddPolicy("PerSecondLimit", httpContext =>
+    {
+        // İstek Anahtarı: Gelen isteğin hangi kritere göre ayrılacağını belirler.
+        // Burada IP adresini kullanıyoruz. (Anonim kullanıcılar için "anonymous" kullanılır)
+        var partitionKey = httpContext.Connection.RemoteIpAddress?.ToString() ?? "anonymous";
+
+        // Fixed Window Limiter'ı, tanımladığımız anahtar üzerinden oluşturur.
+        return RateLimitPartition.GetFixedWindowLimiter(
+            partitionKey: partitionKey,
+            factory: _ => new FixedWindowRateLimiterOptions
+            {
+                PermitLimit = 10,                 // İzin verilen istek sayısı: 10
+                Window = TimeSpan.FromSeconds(1), // Pencere süresi: 1 saniye
+                QueueLimit = 0                    // Kuyruk boyutu: 0 (Limit aşılırsa hemen 429 döndürülür)
+            }
+        );
+    });
+});
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
                        ?? throw new InvalidOperationException("Bağlantı Dizisi 'DefaultConnection' bulunamadı.");
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(connectionString));
+    
 builder.Services.AddTransient<IFileService, FileService>();
 builder.Services.AddSingleton<IPasswordHasher<User>, HasherUtil>();
 builder.Services.AddScoped<IJwtService, JwtService>();
@@ -113,6 +142,7 @@ app.UseStaticFiles(new StaticFileOptions
     RequestPath = "/Uploads"
 });
 app.UseHttpsRedirection();
+app.UseRateLimiter();
 app.UseCors("MyAllowSpecificOrigins");
 app.UseAuthentication();
 app.UseAuthorization();
