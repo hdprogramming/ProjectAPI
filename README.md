@@ -81,7 +81,7 @@ Swagger dökümantasyonuna genellikle `/swagger` yolundan erişebilirsiniz: `htt
 
 Tüm mevcut uç noktaların detaylı bilgileri ve deneme ekranı, uygulama çalışır durumdayken **Swagger UI** üzerinden otomatik olarak sağlanmaktadır.
 
-Detaylar için:(https://gemini.google.com/share/d52153dd71fd)
+Detaylar için:Dökümantasyon.html'ye bakınız
 
 -----
 
