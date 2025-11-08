@@ -40,7 +40,7 @@ Sisteminizde aşağıdaki yazılımların kurulu olması gerekmektedir:
 
   * [.NET 8.0 SDK](https://dotnet.microsoft.com/en-us/download/dotnet/8.0) veya daha yenisi.
   * Tercih edilen bir IDE (Örn: Visual Studio, Visual Studio Code, JetBrains Rider).
-  * [MSSQL].
+  * Database için https://www.microsoft.com/tr-tr/sql-server/sql-server-downloads
 
 #### ⚙️ Adımlar
 
@@ -52,8 +52,9 @@ Sisteminizde aşağıdaki yazılımların kurulu olması gerekmektedir:
 2.  **Ortam Ayarlarını Yapılandırın:**
       * `appsettings.Development.json` dosyasını açın.
       * **Veritabanı Bağlantı Dizesini (`ConnectionStrings`)** kendi yerel veritabanı ayarlarınıza göre güncelleyin.
-3.  **Veritabanını Hazırlayın:**
-      * Entity Framework Core kullanıyorsanız, migrasyonları uygulayın:
+      * Program.cs içindeki <code>policy.WithOrigins("Buraya FrontEnd sunucunuzun adresi gelecek mesela http://localhost:5173 gibi")</code>
+ 3.  **Veritabanını Hazırlayın:**
+      * Gerekli migrasyonları uygulayın:
         ```bash
         dotnet ef database update
         ```
@@ -61,6 +62,7 @@ Sisteminizde aşağıdaki yazılımların kurulu olması gerekmektedir:
       * Projenin ana dizinindeyken (`.csproj` dosyasının olduğu yerde):
         ```bash
         dotnet run
+        yada dotnet watch
         ```
       * **Alternatif:** IDE (Visual Studio/VS Code) üzerinden `Run` veya `Debug` tuşuna basarak da çalıştırabilirsiniz.
 
