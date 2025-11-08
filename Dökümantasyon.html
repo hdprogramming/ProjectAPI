@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ProjectAPI - İnteraktif API Gezgini</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Chosen Palette: Calm Harmony Neutrals -->
+    <!-- Application Structure Plan: Raporun statik Controller bölümlerini, interaktif bir 'API Gezgini' yapısına dönüştürdüm. Sol tarafta Controller'lar arası geçişi sağlayan bir navigasyon menüsü, sağ tarafta ise endpoint'leri gösteren bir içerik alanı bulunuyor. Kullanıcılar, HTTP Metodu (GET, POST vb.) ve Yetkilendirme durumu (Admin, Token Gerekli vb.) bazında endpoint'leri dinamik olarak filtreleyebilir. Bu yapı, geliştiricilerin ihtiyaç duydukları endpoint'i statik bir dokümanda aramaktan çok daha hızlı bulmalarını sağlar. -->
+    <!-- Visualization & Content Choices: Rapor içeriği (endpoint listeleri) metinsel ve kategorik olduğundan, Chart.js/Plotly.js gibi grafik kütüphaneleri kullanılmamıştır. Bunun yerine, endpoint'ler HTML/Tailwind ile 'kart' yapısında sunulmuştur (Goal: Organize/Inform). İnteraktivite (Goal: Organize/Filter), JavaScript filtreleme fonksiyonları ile sağlanmıştır. HTTP Metodları (GET, POST vb.) ve Yetkilendirme seviyeleri, renk kodlu etiketler (badge) olarak sunulmuştur (Presentation: HTML/Tailwind). Bu seçimler, geliştirici odaklı dökümantasyonun okunabilirliğini ve kullanılabilirliğini maksimize eder. NO SVG/Mermaid. -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8f9fa;
+        }
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+        
+        .endpoint-card {
+            border-left-width: 4px;
+            transition: all 0.3s ease-in-out;
+        }
+        
+        .nav-link {
+            transition: all 0.2s ease-in-out;
+            border-left: 4px solid transparent;
+        }
+        
+        .nav-link.active {
+            background-color: #e9ecef;
+            border-left-color: #6d28d9; /* Deep Purple */
+            color: #4338ca; /* Indigo */
+            font-weight: 600;
+        }
+        
+        .nav-link:hover {
+            background-color: #f1f5f9;
+        }
+        
+        .filter-btn {
+            transition: all 0.2s ease;
+        }
+        
+        .filter-btn.active {
+            opacity: 1;
+            transform: scale(1.05);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .filter-btn:not(.active) {
+            opacity: 0.6;
+        }
+
+        .method-badge {
+            font-size: 0.8rem;
+            font-weight: 700;
+            padding: 2px 8px;
+            border-radius: 4px;
+            text-transform: uppercase;
+        }
+        
+        .method-GET { border-color: #22c55e; background-color: #f0fdf4; color: #166534; } /* Green */
+        .method-POST { border-color: #f59e0b; background-color: #fffbeb; color: #78350f; } /* Amber */
+        .PUT, .method-PUT { border-color: #3b82f6; background-color: #eff6ff; color: #1d4ed8; } /* Blue */
+        .DELETE, .method-DELETE { border-color: #ef4444; background-color: #fef2f2; color: #991b1b; } /* Red */
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800">
+
+    <div class="flex flex-col md:flex-row min-h-screen">
+        
+        <!-- Sol Navigasyon Menüsü -->
+        <nav class="w-full md:w-64 lg:w-72 bg-white shadow-md md:sticky md:top-0 md:h-screen">
+            <div class="p-6">
+                <h1 class="text-2xl font-bold text-gray-900">ProjectAPI</h1>
+                <h2 class="text-sm font-medium text-gray-500">API Gezgini</h2>
+            </div>
+            
+            <ul id="nav-menu" class="space-y-1 p-3">
+                <li><a href="#HomeController" class="nav-link block px-4 py-2 rounded-md text-gray-700" data-section="HomeController">Ana Rota</a></li>
+                <li><a href="#AuthController" class="nav-link block px-4 py-2 rounded-md text-gray-700" data-section="AuthController">Kimlik Doğrulama</a></li>
+                <li><a href="#UserController" class="nav-link block px-4 py-2 rounded-md text-gray-700" data-section="UserController">Kullanıcı İşlemleri</a></li>
+                <li><a href="#ProjectController" class="nav-link block px-4 py-2 rounded-md text-gray-700" data-section="ProjectController">Proje İşlemleri</a></li>
+                <li><a href="#UploadController" class="nav-link block px-4 py-2 rounded-md text-gray-700" data-section="UploadController">Dosya Yükleme</a></li>
+                <li><a href="#ProjectUtilsController" class="nav-link block px-4 py-2 rounded-md text-gray-700" data-section="ProjectUtilsController">Yardımcı Veriler</a></li>
+            </ul>
+        </nav>
+
+        <!-- Sağ İçerik Alanı -->
+        <main class="flex-1 p-6 md:p-10">
+            
+            <!-- Filtreleme Alanı -->
+            <div class="mb-8 p-4 bg-white rounded-lg shadow-sm sticky top-0 z-10">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                    <div>
+                        <h3 class="text-lg font-semibold text-gray-800">Filtrele</h3>
+                        <p class="text-sm text-gray-500">Endpoint'leri metoda göre filtreleyin.</p>
+                    </div>
+                    <div id="filter-buttons" class="flex flex-wrap gap-2">
+                        <button class="filter-btn px-4 py-2 rounded-md font-medium text-sm border-2 method-GET" data-filter="GET">GET</button>
+                        <button class="filter-btn px-4 py-2 rounded-md font-medium text-sm border-2 method-POST" data-filter="POST">POST</button>
+                        <button class="filter-btn px-4 py-2 rounded-md font-medium text-sm border-2 method-PUT" data-filter="PUT">PUT</button>
+                        <button class="filter-btn px-4 py-2 rounded-md font-medium text-sm border-2 method-DELETE" data-filter="DELETE">DELETE</button>
+                        <button class="filter-btn px-3 py-2 rounded-md font-medium text-sm bg-gray-600 text-white" data-filter="ALL">TÜMÜ</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Endpoint Kartları Alanı -->
+            <div id="content-area" class="space-y-12">
+                <!-- JavaScript tarafından dinamik olarak doldurulacak -->
+            </div>
+
+        </main>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            
+            // Source Report'tan alınan ham veriler
+            const apiData = [
+                { section: "HomeController", method: "GET", path: "/", description: "API'nin çalışıp çalışmadığını kontrol eden ve bir hoş geldin mesajı döndüren ana \"health check\" noktası.", auth: "Herkese Açık" },
+                { section: "AuthController", method: "POST", path: "/api/auth/register", description: "Yeni bir kullanıcı hesabı oluşturur.", auth: "Herkese Açık" },
+                { section: "AuthController", method: "POST", path: "/api/auth/login", description: "Kullanıcı girişi yapar. Başarılı olursa bir JWT token ve `HttpOnly` cookie olarak bir Refresh Token döndürür.", auth: "Herkese Açık" },
+                { section: "AuthController", method: "POST", path: "/api/auth/Refresh", description: "Cookie'de bulunan Refresh Token'ı kullanarak süresi dolmuş JWT token'ı yeniler ve yeni bir token seti döndürür.", auth: "Token Gerekli (Refresh)" },
+                { section: "UserController", method: "GET", path: "/api/users", description: "Sistemdeki tüm kullanıcıları listeler.", auth: "Admin Gerekli" },
+                { section: "UserController", method: "GET", path: "/api/users/{id}", description: "Belirtilen `id`'ye sahip tek bir kullanıcının detaylarını getirir.", auth: "Token Gerekli (Kullanıcının kendisi veya Admin)" },
+                { section: "UserController", method: "POST", path: "/api/users", description: "Yeni bir kullanıcı oluşturur (Admin paneli için).", auth: "-" },
+                { section: "UserController", method: "PUT", path: "/api/users/{TargetUserID}", description: "`TargetUserID` ile belirtilen kullanıcının profil bilgilerini (Bio, ProfileImage, Password vb.) günceller.", auth: "Token Gerekli (Kullanıcının kendisi)" },
+                { section: "UserController", method: "DELETE", path: "/api/users/{id}", description: "Belirtilen `id`'ye sahip kullanıcıyı sistemden siler.", auth: "Admin Gerekli" },
+                { section: "ProjectController", method: "GET", path: "/api/projects", description: "Tüm projeleri, ilgili kategori ve durum bilgileriyle birlikte listeler.", auth: "Herkese Açık" },
+                { section: "ProjectController", method: "GET", path: "/api/projects/{id}", description: "Belirtilen `id`'ye sahip tek bir projeyi detaylarıyla getirir.", auth: "Herkese Açık" },
+                { section: "ProjectController", method: "POST", path: "/api/projects", description: "Giriş yapmış kullanıcı adına yeni bir proje oluşturur.", auth: "Token Gerekli" },
+                { section: "ProjectController", method: "PUT", path: "/api/projects/{id}", description: "Belirtilen `id`'ye sahip projeyi günceller.", auth: "Token Gerekli (Proje Sahibi veya Admin)" },
+                { section: "ProjectController", method: "DELETE", path: "/api/projects/{id}", description: "Belirtilen `id`'ye sahip projeyi siler.", auth: "Token Gerekli (Proje Sahibi veya Admin)" },
+                { section: "UploadController", method: "POST", path: "/api/uploads/Image", description: "Sunucuya bir resim dosyası (`IFormFile`) yükler. İsteğe bağlı olarak bir `ProjectID` ile ilişkilendirilebilir.", auth: "Token Gerekli" },
+                { section: "UploadController", method: "GET", path: "/api/uploads/MyFiles", description: "Giriş yapmış kullanıcının daha önce yüklediği tüm dosyaları listeler.", auth: "Token Gerekli" },
+                { section: "UploadController", method: "PUT", path: "/api/uploads/Update/{id}", description: "Belirtilen `id`'ye sahip dosyanın adını günceller.", auth: "Token Gerekli" },
+                { section: "UploadController", method: "DELETE", path: "/api/uploads/Delete/{id}", description: "Belirtilen `id`'ye sahip dosyayı sunucudan ve veritabanından siler.", auth: "Token Gerekli" },
+                { section: "ProjectUtilsController", method: "GET", path: "/api/ProjectStatusMessages", description: "Projelerin alabileceği tüm olası durumları (örn: \"Geliştiriliyor\", \"Tamamlandı\") listeler.", auth: "Herkese Açık" },
+                { section: "ProjectUtilsController", method: "GET", path: "/api/ProjectCategories", description: "Projelerin ilişkilendirilebileceği tüm kategorileri (örn: \"Web\", \"Mobil\") listeler.", auth: "Herkese Açık" }
+            ];
+            
+            // Bölüm başlıkları ve giriş metinleri
+            const sectionIntros = {
+                "HomeController": { title: "Ana Rota (HomeController)", intro: "Bu bölüm, API'nin genel durumunu ve erişilebilirliğini kontrol etmek için kullanılan temel bir endpoint içerir." },
+                "AuthController": { title: "Kimlik Doğrulama (AuthController)", intro: "Kullanıcı kaydı, sisteme giriş yapma ve oturum token'larını yenileme gibi temel kimlik doğrulama işlemlerini yönetir." },
+                "UserController": { title: "Kullanıcı İşlemleri (UserController)", intro: "Kullanıcı profillerini yönetmek, listelemek, güncellemek ve silmek için gerekli endpoint'leri içerir. Bazı işlemler Admin yetkisi gerektirebilir." },
+                "ProjectController": { title: "Proje İşlemleri (ProjectController)", intro: "Sistemdeki projelerin oluşturulması, listelenmesi, güncellenmesi ve silinmesi (CRUD) ile ilgili tüm işlemleri kapsar." },
+                "UploadController": { title: "Dosya Yükleme (UploadController)", intro: "Kullanıcıların sunucuya dosya (resim vb.) yüklemesini, kendi dosyalarını yönetmesini ve silmesini sağlayan endpoint'ler." },
+                "ProjectUtilsController": { title: "Yardımcı Veriler (ProjectUtilsController)", intro: "Projeleri sınıflandırmak için kullanılan kategoriler veya durum mesajları gibi statik ve yardımcı verileri sağlayan endpoint'ler." }
+            };
+
+            const contentArea = document.getElementById('content-area');
+            const navMenu = document.getElementById('nav-menu');
+            const filterButtonsContainer = document.getElementById('filter-buttons');
+            
+            let currentFilter = 'ALL';
+            let currentSection = 'HomeController'; // Başlangıç bölümü
+
+            // Endpoint kartını oluşturan fonksiyon
+            function createEndpointCard(endpoint) {
+                const authColor = getAuthColor(endpoint.auth);
+                return `
+                    <article class="endpoint-card bg-white shadow-md rounded-lg overflow-hidden border-${authColor}-500">
+                        <div class="px-5 py-4">
+                            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between">
+                                <span class="method-badge method-${endpoint.method} border-2">${endpoint.method}</span>
+                                <code class="text-sm sm:text-base font-semibold text-gray-800 break-all mt-2 sm:mt-0">${endpoint.path}</code>
+                            </div>
+                            <p class="text-gray-600 mt-3 text-sm">${endpoint.description}</p>
+                            <div class="mt-4">
+                                <span class="inline-block rounded-full px-3 py-1 text-xs font-medium bg-${authColor}-100 text-${authColor}-800">
+                                    Yetki: ${endpoint.auth}
+                                </span>
+                            </div>
+                        </div>
+                    </article>
+                `;
+            }
+
+            // Yetkilendirme durumuna göre renk belirleme
+            function getAuthColor(auth) {
+                if (auth.includes("Admin Gerekli")) return "red";
+                if (auth.includes("Token Gerekli")) return "blue";
+                return "green";
+            }
+
+            // Endpoint'leri ve bölüm başlıklarını render etme
+            function renderContent() {
+                contentArea.innerHTML = ''; 
+                
+                const sections = Object.keys(sectionIntros);
+                
+                sections.forEach(sectionKey => {
+                    const sectionData = sectionIntros[sectionKey];
+                    const sectionElement = document.createElement('section');
+                    sectionElement.id = sectionKey;
+                    
+                    let endpointsHtml = apiData
+                        .filter(ep => ep.section === sectionKey && (currentFilter === 'ALL' || ep.method === currentFilter))
+                        .map(createEndpointCard)
+                        .join('');
+
+                    // Eğer filtreleme sonucu o bölümde hiç endpoint kalmadıysa, bölümü gizle
+                    if (endpointsHtml.length === 0 && currentFilter !== 'ALL') {
+                        return;
+                    }
+
+                    sectionElement.innerHTML = `
+                        <h2 class="text-2xl md:text-3xl font-bold text-gray-900 mb-2">${sectionData.title}</h2>
+                        <p class="text-base text-gray-600 mb-6">${sectionData.intro}</p>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            ${endpointsHtml.length > 0 ? endpointsHtml : '<p class="text-gray-500 col-span-2">Bu filtreye uygun endpoint bulunamadı.</p>'}
+                        </div>
+                    `;
+                    contentArea.appendChild(sectionElement);
+                });
+
+                // Aktif navigasyon linkini ayarla
+                updateActiveNavLink();
+            }
+            
+            // Aktif filtre butonunu ayarla
+            function updateActiveFilterButton(clickedButton) {
+                filterButtonsContainer.querySelectorAll('.filter-btn').forEach(btn => {
+                    btn.classList.remove('active');
+                });
+                clickedButton.classList.add('active');
+            }
+
+            // Aktif navigasyon linkini ayarla
+            function updateActiveNavLink() {
+                navMenu.querySelectorAll('.nav-link').forEach(link => {
+                    link.classList.remove('active');
+                    if (link.getAttribute('data-section') === currentSection) {
+                        link.classList.add('active');
+                    }
+                });
+            }
+
+            // Filtre butonlarına tıklama olayı
+            filterButtonsContainer.addEventListener('click', function(e) {
+                const target = e.target.closest('.filter-btn');
+                if (target) {
+                    currentFilter = target.dataset.filter;
+                    updateActiveFilterButton(target);
+                    renderContent();
+                    
+                    // Filtre değiştiğinde, eğer o an seçili olan bölüm görünmüyorsa
+                    // ilk görünür bölüme scroll et
+                    const firstVisibleSection = contentArea.querySelector('section');
+                    if (firstVisibleSection) {
+                        currentSection = firstVisibleSection.id;
+                        updateActiveNavLink();
+                    }
+                }
+            });
+
+            // Navigasyon linklerine tıklama olayı (scroll için)
+            navMenu.addEventListener('click', function(e) {
+                const target = e.target.closest('.nav-link');
+                if (target) {
+                    e.preventDefault();
+                    currentSection = target.dataset.section;
+                    updateActiveNavLink();
+                    
+                    const sectionElement = document.getElementById(currentSection);
+                    if (sectionElement) {
+                        sectionElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    }
+                }
+            });
+
+            // Başlangıç render'ı
+            currentSection = window.location.hash ? window.location.hash.substring(1) : 'HomeController';
+            if (!sectionIntros[currentSection]) currentSection = 'HomeController';
+            
+            renderContent();
+            updateActiveFilterButton(filterButtonsContainer.querySelector('[data-filter="ALL"]'));
+        });
+    </script>
+</body>
+</html>

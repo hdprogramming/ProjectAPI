@@ -144,7 +144,8 @@ namespace ProjectAPI.Controllers
                             url = $"{baseUrl}/Uploads/{u.filename}"
                         });
                     }
-                    return Ok(founded);
+                    //En son eklenenden en önceye doğru sıralı listeyi döndür
+                    return Ok(founded.OrderByDescending(f=>f.id));
                 }
             }
             catch (Exception error)
