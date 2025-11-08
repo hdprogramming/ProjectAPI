@@ -52,7 +52,7 @@ Sisteminizde aşağıdaki yazılımların kurulu olması gerekmektedir:
 2.  **Ortam Ayarlarını Yapılandırın:**
       * `appsettings.Development.json` dosyasını açın.
       * **Veritabanı Bağlantı Dizesini (`ConnectionStrings`)** kendi yerel veritabanı ayarlarınıza göre güncelleyin.
-      * Program.cs içindeki <code>policy.WithOrigins("Buraya FrontEnd sunucunuzun adresi gelecek mesela http://localhost:5173 gibi")</code>
+      * Program.cs içindeki satırı bulup <code>policy.WithOrigins("Buraya FrontEnd sunucunuzun adresi gelecek mesela http://localhost:5173 gibi")</code> güncelleyin
  3.  **Veritabanını Hazırlayın:**
       * Gerekli migrasyonları uygulayın:
         ```bash
