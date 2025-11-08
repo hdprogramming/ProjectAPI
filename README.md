@@ -1,6 +1,6 @@
 ## ProjectAPI
 
-> Bu proje, bilimsel çalışmalarınızın kaydı için geliştirilmiş, **.NET 8.0** altyapısını kullanan güçlü ve ölçeklenebilir bir **RESTful API** servisidir.
+> Bu proje, bilimsel çalışmalarınızın kaydı için geliştirilmiş, **.NET 8.0** altyapısını kullanan güçlü ve ölçeklenebilir bir **RESTful API** servisidir. İleride yeni özellikler eklenecek ve iyileştirmeler yapılacaktır.
 
 [](https://www.google.com/search?q=https://github.com/hdprogramming/ProjectAPI/blob/main/LICENSE)
 [](https://www.google.com/search?q=https://github.com/hdprogramming/ProjectAPI/stargazers)
