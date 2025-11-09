@@ -53,12 +53,13 @@ namespace ProjectAPI.Controllers
         /// Tüm projeleri listeler. (Genellikle Auth gereksiz olabilir, ihtiyaca göre eklenir)
         /// </summary>
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<ProjectDto>>> GetProjects()
+        public async Task<ActionResult<IEnumerable<ProjectDto>>> GetProjects(int page=1,int length=10)
         {
-            var projects = await _context.Projects
-        // 1. Status Bilgisini Yükle
-
-        .Include(p => p.ProjectCategories)
+            if (page <= 0) page = 1;
+            if (length <= 0) length = 10;
+            const int maxSayfaBoyutu = 100;
+        if (length > maxSayfaBoyutu) length = maxSayfaBoyutu;
+            var projects = await _context.Projects.Include(p => p.ProjectCategories)
         .Include(p => p.Status).OrderDescending()
             .Select(p => new ProjectDto
             {
@@ -71,17 +72,13 @@ namespace ProjectAPI.Controllers
                 isAlive = p.isAlive,
                 date = p.StartingDate,
                 lastdate = p.LastModificationDate,
-                // İlişkili Tekil Alan (Status)
-                // Varsayım: En son Status (Durum) mesajının içeriğini Status olarak alıyoruz.
-                // Mesajları tarihe göre sıralayıp en yenisinin içeriğini almalıyız.
-                status = p.Status.Name             // Mesaj içeriğini seç
-            ,                   // İlk (en yeni) mesaj içeriğini al (yoksa null)
+                status = p.Status.Name
+            ,
                 statusID = p.Status.Id,
-                // İlişkili Liste Alanı (CategoryIds)
 
                 categoryIds = p.ProjectCategories
             .Select(pc => pc.Category.Id).ToList()
-            })
+            }).Skip(page * length).Take(length)
     .ToListAsync();
             // Doğrudan List<ProjectDto> dönüyoruz
             return Ok(projects);
