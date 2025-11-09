@@ -6,7 +6,7 @@ namespace ProjectAPI.Utils;
 public interface IFileService
 {
     Task<string> SaveFileAsync(IFormFile imageFile, string[] allowedFileExtensions);
-    void DeleteFile(string fileNameWithExtension);
+    bool DeleteFile(string fileNameWithExtension);
 }
 
 public class FileService(IWebHostEnvironment environment) : IFileService
@@ -44,7 +44,7 @@ public class FileService(IWebHostEnvironment environment) : IFileService
     }
 
 
-    public void DeleteFile(string fileNameWithExtension)
+    public bool DeleteFile(string fileNameWithExtension)
     {
         if (string.IsNullOrEmpty(fileNameWithExtension))
         {
@@ -55,9 +55,10 @@ public class FileService(IWebHostEnvironment environment) : IFileService
 
         if (!File.Exists(path))
         {
-            throw new FileNotFoundException($"Invalid file path");
+            return false;
         }
         File.Delete(path);
+        return true;
     }
 
 }
