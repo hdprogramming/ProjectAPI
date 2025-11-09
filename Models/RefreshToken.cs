@@ -8,7 +8,7 @@ public class RefreshToken
     public Guid UserID { get; set; }
     
     [Required]
-    public string Token { get; set; }
+    public string? Token { get; set; }
     public DateTime ExpiresOnUtc { get; set; }
     public User user { get; set; } = null!;
     public bool IsRevoked { get; set; } = false;

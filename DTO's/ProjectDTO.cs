@@ -7,11 +7,11 @@ namespace ProjectAPI.DTOs
         public int id { get; set; }
         public string icon { get; set; } = "None";
 
-        public string title { get; set; }
+        public string title { get; set; } = "";
         public string description { get; set; } = string.Empty;
         public string content { get; set; } = string.Empty;
         public bool isAlive { get; set; } = true;
-        public string status { get; set; }
+        public string status { get; set; } = "";
         public int? statusID { get; set; } = 1;
         public List<int> categoryIds { get; set; } = new List<int>();
         public DateOnly? date { get; set; }
@@ -23,7 +23,7 @@ namespace ProjectAPI.DTOs
         public int id { get; set; }
         public string icon { get; set; } = "None";
 
-        public string title { get; set; }
+        public string title { get; set; } = "";
         public string description { get; set; } = string.Empty;
         public string content { get; set; } = string.Empty;
         public bool isAlive { get; set; } = true;

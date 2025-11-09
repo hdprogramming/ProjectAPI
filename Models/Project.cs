@@ -12,7 +12,7 @@ namespace ProjectAPI.Models
 
         public string Icon { get; set; } = "None";
         [Required]
-        public string Title { get; set; }
+        public string? Title { get; set; }
         public string Description { get; set; } = string.Empty;
         public string Content { get; set; } = string.Empty;
         public bool isAlive { get; set; } = true;
@@ -21,7 +21,7 @@ namespace ProjectAPI.Models
         public DateTime LastModificationDate { get; set; } = DateTime.UtcNow;
         public User user { get; set; } = null!;
         public ProjectStatusMsg? Status { get; set; }
-        public ICollection<ProjectCategory> ProjectCategories { get; set; }
+        public ICollection<ProjectCategory>? ProjectCategories { get; set; }
      public ICollection<UploadFile> Files { get; set; } = new List<UploadFile>();
     }
 }

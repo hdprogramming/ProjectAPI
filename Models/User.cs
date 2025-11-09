@@ -1,4 +1,6 @@
 
+using System.ComponentModel.DataAnnotations;
+
 namespace ProjectAPI.Models
 {
     // Bu sınıf, Ürünleri ekleyen kişiyi temsil eder.
@@ -7,7 +9,8 @@ namespace ProjectAPI.Models
         // Primary Key
         public Guid Id { get; set; }
         public string ProfileImageUrl { get; set; } = string.Empty;
-        public string EMail{ get; set; }
+        [Required]
+        public string? EMail{ get; set; }
 
         // Kullanıcı Adı (Örn: "admin", "tester")
         public string? UserName { get; set; } = string.Empty;
