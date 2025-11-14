@@ -78,7 +78,7 @@ namespace ProjectAPI.Controllers
 
                 categoryIds = p.ProjectCategories
             .Select(pc => pc.Category.Id).ToList()
-            }).Skip(page * length).Take(length)
+            }).Skip((page-1) * length).Take(length)
     .ToListAsync();
             // Doğrudan List<ProjectDto> dönüyoruz
             return Ok(projects);
@@ -276,5 +276,6 @@ namespace ProjectAPI.Controllers
 
             return NoContent();
         }
+        
     }
 }

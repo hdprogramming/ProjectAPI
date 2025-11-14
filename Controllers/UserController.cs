@@ -109,6 +109,7 @@ namespace ProjectAPI.Controllers
                 return NotFound();
             }
             userToUpdate.MergeNonNullProperties(updateUserDto);
+                       
             // DTO'dan gelen verileri denetle ona göre entity'yi güncelle
              if (updateUserDto.Password != null)
             {

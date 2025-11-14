@@ -129,6 +129,7 @@
                 { section: "UserController", method: "PUT", path: "/api/users/{TargetUserID}", description: "`TargetUserID` ile belirtilen kullanıcının profil bilgilerini (Bio, ProfileImage, Password vb.) günceller.", auth: "Token Gerekli (Kullanıcının kendisi)" },
                 { section: "UserController", method: "DELETE", path: "/api/users/{id}", description: "Belirtilen `id`'ye sahip kullanıcıyı sistemden siler.", auth: "Admin Gerekli" },
                 { section: "ProjectController", method: "GET", path: "/api/projects", description: "Tüm projeleri, ilgili kategori ve durum bilgileriyle birlikte listeler.", auth: "Herkese Açık" },
+                   { section: "ProjectController", method: "GET", path: "/api/projects?page=SayfaSayısı&length=GetirilecekSayfaSayısı", description: "page ve length parametrelerine göre , ilgili kategori ve durum bilgileriyle birlikte listelenir.", auth: "Herkese Açık" },
                 { section: "ProjectController", method: "GET", path: "/api/projects/{id}", description: "Belirtilen `id`'ye sahip tek bir projeyi detaylarıyla getirir.", auth: "Herkese Açık" },
                 { section: "ProjectController", method: "POST", path: "/api/projects", description: "Giriş yapmış kullanıcı adına yeni bir proje oluşturur.", auth: "Token Gerekli" },
                 { section: "ProjectController", method: "PUT", path: "/api/projects/{id}", description: "Belirtilen `id`'ye sahip projeyi günceller.", auth: "Token Gerekli (Proje Sahibi veya Admin)" },

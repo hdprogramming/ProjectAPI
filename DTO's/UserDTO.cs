@@ -35,7 +35,7 @@ namespace ProjectAPI.DTOs
         
         public string? Password { get; set; }
         public string? ProfileImageUrl { get; set; } 
-         public string Bio { get; set; } = string.Empty;
+         public string? Bio { get; set; }
     }
     public class UserDTODetails
     {

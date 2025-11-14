@@ -23,6 +23,16 @@ namespace ProjectAPI.Controllers
     {
         private readonly AppDbContext _context;
         private readonly IFileService _fileService;
+        private Guid? GetCurrentUserId()
+        {
+            // 'ClaimTypes.NameIdentifier' genellikle User ID'yi (Guid) tutar.
+            var userIdString = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (Guid.TryParse(userIdString, out var userIdGuid))
+            {
+                return userIdGuid;
+            }            
+            return null;
+        }
         // Constructor'ı kendi servislerinle güncelle (IJwtService)
         public UploadsController(AppDbContext context, IFileService fileService)
         {
@@ -156,7 +166,7 @@ namespace ProjectAPI.Controllers
         }
         [HttpPut("Update/{id}")]
         [Authorize]
-         [EnableRateLimiting("PerSecondLimit")]
+        [EnableRateLimiting("PerSecondLimit")]
         public async Task<IActionResult> ModifyFile(int id,UploadModDTO uploadModDTO)
         {
             var foundedfile = await _context.UploadFiles.FirstAsync(up => up.Id == id);
@@ -173,19 +183,54 @@ namespace ProjectAPI.Controllers
         }
         [HttpDelete("Delete/{id}")]
         [Authorize]
-         [EnableRateLimiting("PerSecondLimit")]
+        [EnableRateLimiting("PerSecondLimit")]
         public async Task<IActionResult> DeleteFile(int id)
         {
-            var founded = await _context.UploadFiles.FirstOrDefaultAsync(f => f.Id == id);
+            var CurrentUserID = GetCurrentUserId();
+            var founded = await _context.UploadFiles.FirstOrDefaultAsync(f => f.Id == id && f.UserId == CurrentUserID);
+            
             if (founded == null)
                 return NotFound();
-            
-             
-            if (founded.filename != null)
-                _fileService.DeleteFile(founded.filename);
+
             _context.UploadFiles.Remove(founded);
             await _context.SaveChangesAsync();
+            if (founded.filename != null)
+                _fileService.DeleteFile(founded.filename);
+            
             return Ok("Dosya silindi");
+        }
+
+        [HttpDelete("DeleteFiles")]
+        [Authorize]
+        [EnableRateLimiting("PerSecondLimit")]
+        public async Task<IActionResult> DeleteFiles(int[] ids)
+        {
+            var CurrentUserID = GetCurrentUserId();
+            var founded = await _context.UploadFiles.Where(p => ids.Contains(p.Id) && p.UserId == CurrentUserID).ToListAsync();
+            if (founded == null)
+                return NotFound();
+            _context.UploadFiles.RemoveRange(founded);
+            await _context.SaveChangesAsync();
+            foreach (var f in founded)
+                if (f.filename != null)
+                    _fileService.DeleteFile(f.filename);            
+            return Ok("Dosyalar silindi");
+        }
+        //İleride admin için bir takım yetkiler gerekebilir
+        [HttpDelete("DeleteFilesByAdmin")]
+        [Authorize(Roles ="Admin")]
+        [EnableRateLimiting("PerSecondLimit")]        
+        public async Task<IActionResult> DeleteFilesByAdmin(int[] ids)
+        {            
+            var founded = await _context.UploadFiles.Where(p => ids.Contains(p.Id) ).ToListAsync();
+            if (founded == null)
+                return NotFound();            
+            foreach(var f in founded)
+            if (f.filename != null)
+                _fileService.DeleteFile(f.filename);
+            _context.UploadFiles.RemoveRange(founded);
+            await _context.SaveChangesAsync();
+            return Ok("Admin tarafından Dosyalar silindi");
         }
     }
 }
