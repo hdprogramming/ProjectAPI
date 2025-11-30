@@ -62,6 +62,11 @@
         .method-GET { border-color: #22c55e; background-color: #f0fdf4; color: #166534; } /* Green */
         .method-POST { border-color: #f59e0b; background-color: #fffbeb; color: #78350f; } /* Amber */
         .PUT, .method-PUT { border-color: #3b82f6; background-color: #eff6ff; color: #1d4ed8; } /* Blue */
+        .PATCH, .method-PATCH { 
+    border-color: #8b5cf6; /* Violet-500 */
+    background-color: #f5f3ff; /* Violet-50 */
+    color: #5b21b6; /* Violet-800 */
+}
         .DELETE, .method-DELETE { border-color: #ef4444; background-color: #fef2f2; color: #991b1b; } /* Red */
     </style>
 </head>
@@ -100,6 +105,7 @@
                         <button class="filter-btn px-4 py-2 rounded-md font-medium text-sm border-2 method-GET" data-filter="GET">GET</button>
                         <button class="filter-btn px-4 py-2 rounded-md font-medium text-sm border-2 method-POST" data-filter="POST">POST</button>
                         <button class="filter-btn px-4 py-2 rounded-md font-medium text-sm border-2 method-PUT" data-filter="PUT">PUT</button>
+                         <button class="filter-btn px-4 py-2 rounded-md font-medium text-sm border-2 method-PATCH" data-filter="PATCH">PATCH</button>
                         <button class="filter-btn px-4 py-2 rounded-md font-medium text-sm border-2 method-DELETE" data-filter="DELETE">DELETE</button>
                         <button class="filter-btn px-3 py-2 rounded-md font-medium text-sm bg-gray-600 text-white" data-filter="ALL">TÜMÜ</button>
                     </div>
@@ -126,13 +132,13 @@
                 { section: "UserController", method: "GET", path: "/api/users", description: "Sistemdeki tüm kullanıcıları listeler.", auth: "Admin Gerekli" },
                 { section: "UserController", method: "GET", path: "/api/users/{id}", description: "Belirtilen `id`'ye sahip tek bir kullanıcının detaylarını getirir.", auth: "Token Gerekli (Kullanıcının kendisi veya Admin)" },
                 { section: "UserController", method: "POST", path: "/api/users", description: "Yeni bir kullanıcı oluşturur (Admin paneli için).", auth: "-" },
-                { section: "UserController", method: "PUT", path: "/api/users/{TargetUserID}", description: "`TargetUserID` ile belirtilen kullanıcının profil bilgilerini (Bio, ProfileImage, Password vb.) günceller.", auth: "Token Gerekli (Kullanıcının kendisi)" },
+                { section: "UserController", method: "PATCH", path: "/api/users/{TargetUserID}", description: "`TargetUserID` ile belirtilen kullanıcının profil bilgilerini (Bio, ProfileImage, Password vb.) günceller.", auth: "Token Gerekli (Kullanıcının kendisi)" },
                 { section: "UserController", method: "DELETE", path: "/api/users/{id}", description: "Belirtilen `id`'ye sahip kullanıcıyı sistemden siler.", auth: "Admin Gerekli" },
                 { section: "ProjectController", method: "GET", path: "/api/projects", description: "Tüm projeleri, ilgili kategori ve durum bilgileriyle birlikte listeler.", auth: "Herkese Açık" },
                    { section: "ProjectController", method: "GET", path: "/api/projects?page=SayfaSayısı&length=GetirilecekSayfaSayısı", description: "page ve length parametrelerine göre , ilgili kategori ve durum bilgileriyle birlikte listelenir.", auth: "Herkese Açık" },
                 { section: "ProjectController", method: "GET", path: "/api/projects/{id}", description: "Belirtilen `id`'ye sahip tek bir projeyi detaylarıyla getirir.", auth: "Herkese Açık" },
                 { section: "ProjectController", method: "POST", path: "/api/projects", description: "Giriş yapmış kullanıcı adına yeni bir proje oluşturur.", auth: "Token Gerekli" },
-                { section: "ProjectController", method: "PUT", path: "/api/projects/{id}", description: "Belirtilen `id`'ye sahip projeyi günceller.", auth: "Token Gerekli (Proje Sahibi veya Admin)" },
+                { section: "ProjectController", method: "PATCH", path: "/api/projects/{id}", description: "Belirtilen `id`'ye sahip projeyi günceller.", auth: "Token Gerekli (Proje Sahibi veya Admin)" },
                 { section: "ProjectController", method: "DELETE", path: "/api/projects/{id}", description: "Belirtilen `id`'ye sahip projeyi siler.", auth: "Token Gerekli (Proje Sahibi veya Admin)" },
                 { section: "UploadController", method: "POST", path: "/api/uploads/Image", description: "Sunucuya bir resim dosyası (`IFormFile`) yükler. İsteğe bağlı olarak bir `ProjectID` ile ilişkilendirilebilir.", auth: "Token Gerekli" },
                 { section: "UploadController", method: "GET", path: "/api/uploads/MyFiles", description: "Giriş yapmış kullanıcının daha önce yüklediği tüm dosyaları listeler.", auth: "Token Gerekli" },

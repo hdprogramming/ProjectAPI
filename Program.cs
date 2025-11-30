@@ -14,7 +14,8 @@ using Microsoft.OpenApi.Models;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.AspNetCore.HttpOverrides;
 using System.Threading.RateLimiting;
-
+//Admin Email:admin@projectapi.com
+//Admin Şifre:Admin123+
 var builder = WebApplication.CreateBuilder(args);
 // Rate Limiting Servislerini Ekleme
 builder.Services.AddRateLimiter(options =>
@@ -91,7 +92,7 @@ builder.Services.AddCors(options =>
     options.AddPolicy(name: "MyAllowSpecificOrigins",
          policy =>
          {
-             policy.WithOrigins("http://localhost:5173") // 👈 BURAYI DÜZELT: React uygulamanın TAM adresi
+             policy.WithOrigins("http://localhost:5173","https://localhost:5173","http://localhost:3000","https://localhost:3000") // 👈 BURAYI DÜZELT: React uygulamanın TAM adresi
                    .AllowAnyHeader()                     // İzin verilen HTTP başlıkları
                    .AllowAnyMethod()                     // İzin verilen HTTP metotları (GET, POST, vb.)
                    .AllowCredentials();                  // 👈 KRİTİK AYAR: Çerezlerin (Cookies) gönderilmesine izin ver!

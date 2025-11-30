@@ -36,7 +36,7 @@ namespace ProjectAPI.Controllers
             
             var users = await _context.Users.Where(u => u.EMail != "admin@projectapi.com")
                 .OrderDescending()
-                .Select(u => new SecuredUserDto{  UserName = u.UserName, Email = u.EMail,ProfileImageUrl=u.ProfileImageUrl })
+                .Select(u => new SecuredUserDto{  id=u.Id,UserName = u.UserName, Email = u.EMail,ProfileImageUrl=u.ProfileImageUrl, Bio=u.Bio })
                 .ToListAsync();
             return Ok(users);
         }
@@ -90,11 +90,11 @@ namespace ProjectAPI.Controllers
             await _context.SaveChangesAsync();
             return Ok("Kullanıcı Oluşturuldu");
         }
-        // PUT: api/users/5
+        // PATCH: api/users/5
         /// <summary>
         /// Bir kullanıcının bilgilerini günceller. Kullanıcı sadece kendi bilgilerini güncelleyebilir.
         /// </summary>
-        [HttpPut("TargetUserID")]
+        [HttpPatch("TargetUserID")]
         [Authorize]
         public async Task<IActionResult> UpdateUser(Guid TargetUserID, [FromBody] UpdateUserDto updateUserDto)
         {

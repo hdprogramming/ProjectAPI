@@ -15,6 +15,7 @@ namespace ProjectAPI.DTOs
     }
     public class SecuredUserDto
     {
+        public Guid id { get; set; }
         public string? UserName { get; set; }
         public string? Email { get; set; }
         public string ProfileImageUrl { get; set; } = string.Empty;

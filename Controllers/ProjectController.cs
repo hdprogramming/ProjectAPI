@@ -173,8 +173,8 @@ namespace ProjectAPI.Controllers
             return CreatedAtAction(nameof(GetProject), new { id = project.Id }, projectDto);
         }
 
-        // PUT: api/Projects/5
-        [HttpPut("{id}")]
+        // PATCH: api/Projects/5
+        [HttpPatch("{id}")]
         [Authorize]
         public async Task<IActionResult> UpdateProject(int id, ProjectUpdateDto projectUpdate)
         {
