@@ -125,25 +125,43 @@
             
             // Source Report'tan alınan ham veriler
             const apiData = [
+                // --- HOME ---
                 { section: "HomeController", method: "GET", path: "/", description: "API'nin çalışıp çalışmadığını kontrol eden ve bir hoş geldin mesajı döndüren ana \"health check\" noktası.", auth: "Herkese Açık" },
+                
+                // --- AUTH ---
                 { section: "AuthController", method: "POST", path: "/api/auth/register", description: "Yeni bir kullanıcı hesabı oluşturur.", auth: "Herkese Açık" },
                 { section: "AuthController", method: "POST", path: "/api/auth/login", description: "Kullanıcı girişi yapar. Başarılı olursa bir JWT token ve `HttpOnly` cookie olarak bir Refresh Token döndürür.", auth: "Herkese Açık" },
                 { section: "AuthController", method: "POST", path: "/api/auth/Refresh", description: "Cookie'de bulunan Refresh Token'ı kullanarak süresi dolmuş JWT token'ı yeniler ve yeni bir token seti döndürür.", auth: "Token Gerekli (Refresh)" },
-                { section: "UserController", method: "GET", path: "/api/users", description: "Sistemdeki tüm kullanıcıları listeler.", auth: "Admin Gerekli" },
+                
+                // --- USER (GÜNCELLENDİ) ---
+                { section: "UserController", method: "GET", path: "/api/users?deleted=false", description: "Sistemdeki kullanıcıları listeler. `deleted=true` parametresi ile sadece silinmiş (Soft Deleted) kullanıcılar listelenir.", auth: "Admin Gerekli" },
                 { section: "UserController", method: "GET", path: "/api/users/{id}", description: "Belirtilen `id`'ye sahip tek bir kullanıcının detaylarını getirir.", auth: "Token Gerekli (Kullanıcının kendisi veya Admin)" },
                 { section: "UserController", method: "POST", path: "/api/users", description: "Yeni bir kullanıcı oluşturur (Admin paneli için).", auth: "-" },
+                { section: "UserController", method: "POST", path: "/api/users/Recover/{id}", description: "Soft Delete ile silinmiş bir kullanıcıyı ve ona bağlı projeleri geri getirir (Restore).", auth: "Admin Gerekli" },
                 { section: "UserController", method: "PATCH", path: "/api/users/{TargetUserID}", description: "`TargetUserID` ile belirtilen kullanıcının profil bilgilerini (Bio, ProfileImage, Password vb.) günceller.", auth: "Token Gerekli (Kullanıcının kendisi)" },
-                { section: "UserController", method: "DELETE", path: "/api/users/{id}", description: "Belirtilen `id`'ye sahip kullanıcıyı sistemden siler.", auth: "Admin Gerekli" },
-                { section: "ProjectController", method: "GET", path: "/api/projects", description: "Tüm projeleri, ilgili kategori ve durum bilgileriyle birlikte listeler.", auth: "Herkese Açık" },
-                   { section: "ProjectController", method: "GET", path: "/api/projects?page=SayfaSayısı&length=GetirilecekSayfaSayısı", description: "page ve length parametrelerine göre , ilgili kategori ve durum bilgileriyle birlikte listelenir.", auth: "Herkese Açık" },
-                { section: "ProjectController", method: "GET", path: "/api/projects/{id}", description: "Belirtilen `id`'ye sahip tek bir projeyi detaylarıyla getirir.", auth: "Herkese Açık" },
-                { section: "ProjectController", method: "POST", path: "/api/projects", description: "Giriş yapmış kullanıcı adına yeni bir proje oluşturur.", auth: "Token Gerekli" },
-                { section: "ProjectController", method: "PATCH", path: "/api/projects/{id}", description: "Belirtilen `id`'ye sahip projeyi günceller.", auth: "Token Gerekli (Proje Sahibi veya Admin)" },
-                { section: "ProjectController", method: "DELETE", path: "/api/projects/{id}", description: "Belirtilen `id`'ye sahip projeyi siler.", auth: "Token Gerekli (Proje Sahibi veya Admin)" },
-                { section: "UploadController", method: "POST", path: "/api/uploads/Image", description: "Sunucuya bir resim dosyası (`IFormFile`) yükler. İsteğe bağlı olarak bir `ProjectID` ile ilişkilendirilebilir.", auth: "Token Gerekli" },
-                { section: "UploadController", method: "GET", path: "/api/uploads/MyFiles", description: "Giriş yapmış kullanıcının daha önce yüklediği tüm dosyaları listeler.", auth: "Token Gerekli" },
-                { section: "UploadController", method: "PUT", path: "/api/uploads/Update/{id}", description: "Belirtilen `id`'ye sahip dosyanın adını günceller.", auth: "Token Gerekli" },
-                { section: "UploadController", method: "DELETE", path: "/api/uploads/Delete/{id}", description: "Belirtilen `id`'ye sahip dosyayı sunucudan ve veritabanından siler.", auth: "Token Gerekli" },
+                { section: "UserController", method: "DELETE", path: "/api/users/{id}", description: "Kullanıcıyı 'Soft Delete' yöntemiyle siler (Çöp kutusuna taşır). Veri tabanından tamamen silinmez.", auth: "Token Gerekli (Kullanıcının kendisi veya Admin)" },
+                { section: "UserController", method: "DELETE", path: "/api/users/Permanent/{id}", description: "Kullanıcıyı ve verilerini veritabanından KALICI olarak siler (Hard Delete). Bu işlem geri alınamaz.", auth: "Admin Gerekli" },
+
+               // --- PROJECTS (GÜNCELLENDİ) ---
+                { section: "ProjectController", method: "GET", path: "/api/Projects?page=1&length=10", description: "Projeleri sayfalı şekilde listeler. İlişkili kategori ve durum bilgisini içerir.", auth: "Herkese Açık" },
+                { section: "ProjectController", method: "GET", path: "/api/Projects/{id}", description: "Spesifik bir projenin detaylarını getirir.", auth: "Herkese Açık" },
+                { section: "ProjectController", method: "POST", path: "/api/Projects", description: "Yeni proje oluşturur. `categoryIds` listesi ile kategori atanabilir.", auth: "Token Gerekli" },
+                { section: "ProjectController", method: "PATCH", path: "/api/Projects/{id}", description: "Proje bilgilerini günceller. Sadece Proje Sahibi veya Admin yapabilir.", auth: "Token Gerekli (Sahip/Admin)" },
+                { section: "ProjectController", method: "DELETE", path: "/api/Projects/{id}", description: "Projeyi 'Soft Delete' ile siler (Arşivler). Veritabanından silinmez.", auth: "Token Gerekli (Sahip/Admin)" },
+                { section: "ProjectController", method: "POST", path: "/api/Projects/Recover/{id}", description: "Soft Delete ile silinmiş projeyi geri getirir.", auth: "Token Gerekli (Sahip/Admin)" },
+                { section: "ProjectController", method: "DELETE", path: "/api/Projects/Permanent/{id}", description: "Projeyi veritabanından KALICI olarak siler (Hard Delete).", auth: "Admin Gerekli" },
+
+                // --- UPLOADS (YENİDEN DÜZENLENDİ) ---
+                { section: "UploadController", method: "POST", path: "/api/Uploads/Image", description: "Resim yükler (Max 3MB, .jpg/.png). `ProjectID` gönderilirse projeye bağlanır.", auth: "Token Gerekli" },
+                { section: "UploadController", method: "GET", path: "/api/Uploads/MyFiles", description: "Kullanıcının sadece AKTİF (silinmemiş) dosyalarını listeler.", auth: "Token Gerekli" },
+                { section: "UploadController", method: "GET", path: "/api/Uploads/MyDeletedFiles", description: "Kullanıcının çöp kutusundaki (Soft Deleted) dosyalarını listeler.", auth: "Token Gerekli" },
+                { section: "UploadController", method: "PUT", path: "/api/Uploads/Update/{id}", description: "Yüklenen dosyanın görünen adını (name) günceller.", auth: "Token Gerekli" },
+                { section: "UploadController", method: "DELETE", path: "/api/Uploads/Delete/{id}", description: "Dosyayı Soft Delete ile siler (Görünmez yapar).", auth: "Token Gerekli" },
+                { section: "UploadController", method: "POST", path: "/api/Uploads/Recover/{id}", description: "Silinen dosyayı çöp kutusundan geri getirir.", auth: "Token Gerekli" },
+                { section: "UploadController", method: "DELETE", path: "/api/Uploads/Permanent/{id}", description: "Dosyayı hem veritabanından hem diskten KALICI siler.", auth: "Token Gerekli" },
+                { section: "UploadController", method: "DELETE", path: "/api/Uploads/DeleteFiles", description: "Birden çok dosyayı ID listesi vererek Soft Delete yapar (Toplu Silme).", auth: "Token Gerekli" },
+                { section: "UploadController", method: "DELETE", path: "/api/Uploads/DeleteFilesByAdmin", description: "Admin yetkisiyle birden çok dosyayı KALICI siler.", auth: "Admin Gerekli" },
+                // --- UTILS ---
                 { section: "ProjectUtilsController", method: "GET", path: "/api/ProjectStatusMessages", description: "Projelerin alabileceği tüm olası durumları (örn: \"Geliştiriliyor\", \"Tamamlandı\") listeler.", auth: "Herkese Açık" },
                 { section: "ProjectUtilsController", method: "GET", path: "/api/ProjectCategories", description: "Projelerin ilişkilendirilebileceği tüm kategorileri (örn: \"Web\", \"Mobil\") listeler.", auth: "Herkese Açık" }
             ];
