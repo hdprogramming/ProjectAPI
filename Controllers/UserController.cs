@@ -31,14 +31,23 @@ namespace ProjectAPI.Controllers
         /// </summary>
         [HttpGet]
         [Authorize(Roles = "Admin")] 
-        public async Task<ActionResult<IEnumerable<SecuredUserDto>>> GetUsers()
+        public async Task<ActionResult<IEnumerable<SecuredUserDto>>> GetUsers([FromQuery] bool deleted = false)
         {
-            
+            if(deleted==true)
+            {
+             var users = await _context.Users.Where(u => u.EMail != "admin@projectapi.com")
+                .IgnoreQueryFilters().OrderDescending().Where(u => u.IsDeleted == true)
+                .Select(u => new SecuredUserDto{  id=u.Id,UserName = u.UserName, Email = u.EMail,ProfileImageUrl=u.ProfileImageUrl, Bio=u.Bio,isDeleted=u.IsDeleted })
+                .ToListAsync();
+            return Ok(users);   
+            }
+            else{
             var users = await _context.Users.Where(u => u.EMail != "admin@projectapi.com")
                 .OrderDescending()
-                .Select(u => new SecuredUserDto{  id=u.Id,UserName = u.UserName, Email = u.EMail,ProfileImageUrl=u.ProfileImageUrl, Bio=u.Bio })
+                .Select(u => new SecuredUserDto{  id=u.Id,UserName = u.UserName, Email = u.EMail,ProfileImageUrl=u.ProfileImageUrl, Bio=u.Bio})
                 .ToListAsync();
             return Ok(users);
+            }
         }
 
         // GET: api/users/5
@@ -140,11 +149,74 @@ namespace ProjectAPI.Controllers
                 return NotFound();
             }
 
-            _context.Users.Remove(userToDelete);
-            await _context.SaveChangesAsync();
+            // Soft Delete işlemi
+    userToDelete.IsDeleted = true;
+    userToDelete.DeletedAt = DateTime.UtcNow; // Tarihçeyi tutmak için
+
+    // Sadece durumu güncelliyoruz, kaydı silmiyoruz
+    _context.Users.Update(userToDelete); 
+    // Bağlı projeleri de soft delete yapıyoruz (Önceki konuşmamızdaki gibi)
+        foreach (var project in userToDelete.Projects)
+        {
+            project.IsDeleted = true;
+        }
+    await _context.SaveChangesAsync();
 
             return NoContent();
         }
+        [HttpPost("Recover/{id}")]
+        [Authorize(Roles = "Admin")] 
+        public async Task<IActionResult> RecoverUser(Guid id)
+        {
+            if (!IsUserAuthorized(id))
+            {
+                return Forbid(); // 403 Forbidden - Yetkiniz yok.
+            }
+            var userToDelete = await _context.Users.IgnoreQueryFilters().FirstOrDefaultAsync(u => u.Id == id);
+            if (userToDelete == null)
+            {
+                return NotFound();
+            }
+
+            // Soft Delete işlemi
+    userToDelete.IsDeleted = false;
+    userToDelete.DeletedAt = DateTime.UtcNow; // Tarihçeyi tutmak için
+
+    // Sadece durumu güncelliyoruz, kaydı silmiyoruz
+    _context.Users.Update(userToDelete); 
+    // Bağlı projeleri de soft delete yapıyoruz (Önceki konuşmamızdaki gibi)
+        foreach (var project in userToDelete.Projects)
+        {
+            project.IsDeleted = true;
+        }
+    await _context.SaveChangesAsync();
+
+            return NoContent();
+        }
+        [HttpDelete("Permanent/{id}")]
+    public async Task<IActionResult> HardDeleteUser(Guid id)
+    {
+        // DİKKAT: Burada 'IgnoreQueryFilters()' kullanmak ZORUNDAYIZ.
+        // Çünkü kullanıcı daha önce Soft Delete yapılmış olabilir. 
+        // Filtreyi kaldırmazsak EF Core onu bulamaz ve "yok" sanır.
+        var user = await _context.Users
+                                 .IgnoreQueryFilters() 
+                                 .Include(u => u.Projects)
+                                 .FirstOrDefaultAsync(u => u.Id == id);
+
+        if (user == null) return NotFound("Silinecek kullanıcı bulunamadı.");
+
+        // Hard Delete İşlemi
+        // Remove komutu SQL'de 'DELETE FROM Users WHERE...' çalıştırır.
+        _context.Users.Remove(user); 
+        
+        // EF Core, Cascade Delete ayarı açıksa projeleri de otomatik silebilir
+        // Ama garanti olsun istersen projeleri de RemoveRange ile silebilirsin.
+        
+        await _context.SaveChangesAsync();
+
+        return Ok("Kullanıcı veritabanından tamamen silindi (Hard Deleted).");
+    }
 
         // --- Yardımcı Metotlar ---
 
@@ -163,4 +235,5 @@ namespace ProjectAPI.Controllers
             return targetUserId == currentUserId || currentUserRole == "Admin";
         }
     }
+    
 }

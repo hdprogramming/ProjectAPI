@@ -30,7 +30,7 @@ namespace ProjectAPI.Controllers
             if (Guid.TryParse(userIdString, out var userIdGuid))
             {
                 return userIdGuid;
-            }            
+            }
             return null;
         }
         // Constructor'ı kendi servislerinle güncelle (IJwtService)
@@ -42,7 +42,7 @@ namespace ProjectAPI.Controllers
         // POST: api/Upload/Image
         [HttpPost("Image")]
         [Authorize]
-       [EnableRateLimiting("PerSecondLimit")]
+        [EnableRateLimiting("PerSecondLimit")]
         public async Task<IActionResult> UploadImage([FromForm] UploadImageDTO uploadImage)
         {
             var userIdString = User.FindFirstValue(ClaimTypes.NameIdentifier);
@@ -116,58 +116,93 @@ namespace ProjectAPI.Controllers
         public async Task<IActionResult> MyFiles()
         {
             var userIdString = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            // ID kontrol blokları (Aynen koruyoruz)
             if (string.IsNullOrEmpty(userIdString))
             {
-                // Token geçerli ama içinde ID yoksa (anormal bir durum)
-                return Unauthorized("Kullanıcı kimliği token içinde bulunamadı.");
+                return Unauthorized("Kullanıcı kimliği bulunamadı.");
             }
 
             if (!Guid.TryParse(userIdString, out Guid userGuid))
             {
-                // Token'daki ID, Guid formatında değilse (hata)
                 return BadRequest("Geçersiz kullanıcı kimliği formatı.");
             }
+
             try
             {
-                var userWithfiles = await _context.Users.Include(user => user.uploadFiles).FirstOrDefaultAsync(u => u.Id == userGuid);
-                if (userWithfiles == null)
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    List<UploadedFilesDTO> founded = new List<UploadedFilesDTO>();
-                    var scheme = HttpContext.Request.Scheme;   // "http" veya "https://
-                    var host = HttpContext.Request.Host.Value; // "localhost:5001" veya "api.siteniz.com"
+                // URL oluşturma kısmı
+                var scheme = HttpContext.Request.Scheme;
+                var host = HttpContext.Request.Host.Value;
+                var pathBase = HttpContext.Request.PathBase.Value;
+                var baseUrl = $"{scheme}://{host}{pathBase}";
 
-                    // Eğer uygulamanız bir alt dizin üzerinden yayın yapıyorsa (örn: /api)
-                    var pathBase = HttpContext.Request.PathBase.Value; // "/api" veya ""
+                // --- OPTİMİZE EDİLMİŞ KISIM ---
 
-                    // Tam adres (PathBase'i de ekleyerek)
-                    var baseUrl = $"{scheme}://{host}{pathBase}";
-                    foreach (UploadFile u in userWithfiles.uploadFiles)
+                // 1. Direkt Dosya tablosuna sorgu atıyoruz (_context.UploadFiles)
+                // 2. Where ile sadece bu kullanıcıya ait VE silinmemiş (!IsDeleted) olanları seçiyoruz.
+                // (Eğer UploadFile için Global Filter eklediysen !IsDeleted kısmı otomatik çalışır ama elle yazmak daha garanti ve okunaklıdır)
+
+                var files = await _context.UploadFiles
+                    .Where(u => u.UserId == userGuid && !u.IsDeleted)
+                    .OrderByDescending(u => u.Id) // Yeniden eskiye sırala
+                    .Select(u => new UploadedFilesDTO
                     {
-                        founded.Add(new UploadedFilesDTO
-                        {
-                            id = u.Id,
-                            name = u.name,
-                            url = $"{baseUrl}/Uploads/{u.filename}"
-                        });
-                    }
-                    //En son eklenenden en önceye doğru sıralı listeyi döndür
-                    return Ok(founded.OrderByDescending(f=>f.id));
-                }
+                        id = u.Id,
+                        name = u.name,
+                        url = $"{baseUrl}/Uploads/{u.filename}"
+                    })
+                    .ToListAsync(); // Veritabanından sadece ihtiyacımız olan veriyi çeker
+
+                return Ok(files);
             }
             catch (Exception error)
             {
                 return BadRequest(error.Message);
             }
+        }
+        [HttpGet("MyDeletedFiles")]
+        [Authorize]
+        public async Task<IActionResult> MyDeletedFiles()
+        {
+            var userIdString = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (string.IsNullOrEmpty(userIdString) || !Guid.TryParse(userIdString, out Guid userGuid))
+            {
+                return Unauthorized("Geçersiz kullanıcı kimliği.");
+            }
 
+            try
+            {
+                // URL oluşturma kısmı aynen kalıyor
+                var baseUrl = $"{HttpContext.Request.Scheme}://{HttpContext.Request.Host.Value}{HttpContext.Request.PathBase.Value}";
+
+                // --- DEĞİŞİKLİK BURADA BAŞLIYOR ---
+
+                // 1. User tablosunu değil, direkt UploadFile tablosunu sorguluyoruz.
+                // 2. IgnoreQueryFilters() diyoruz ki silinenleri görebilelim.
+                // 3. Where ile hem KULLANICIYI hem de SİLİNME durumunu SQL'de filtreliyoruz.
+                var deletedFiles = await _context.UploadFiles // DbContext'inde bu tablonun adı neyse (UploadFiles veya Files)
+                    .IgnoreQueryFilters()
+                    .Where(f => f.UserId == userGuid && f.IsDeleted == true)
+                    .OrderByDescending(f => f.Id) // Sıralamayı da veritabanına yaptırıyoruz
+                    .Select(u => new UploadedFilesDTO // Select ile direkt DTO'ya çeviriyoruz (Foreach'e gerek kalmıyor)
+                    {
+                        id = u.Id,
+                        name = u.name, // Modelindeki property ismi küçük harfliyse "name", büyükse "Name"
+                        url = $"{baseUrl}/Uploads/{u.filename}"
+                    })
+                    .ToListAsync();
+
+                return Ok(deletedFiles);
+            }
+            catch (Exception error)
+            {
+                return BadRequest(error.Message);
+            }
         }
         [HttpPut("Update/{id}")]
         [Authorize]
         [EnableRateLimiting("PerSecondLimit")]
-        public async Task<IActionResult> ModifyFile(int id,UploadModDTO uploadModDTO)
+        public async Task<IActionResult> ModifyFile(int id, UploadModDTO uploadModDTO)
         {
             var foundedfile = await _context.UploadFiles.FirstAsync(up => up.Id == id);
             if (foundedfile == null)
@@ -177,7 +212,7 @@ namespace ProjectAPI.Controllers
                 foundedfile.name = uploadModDTO.name;
                 _context.UploadFiles.Update(foundedfile);
                 await _context.SaveChangesAsync();
-                 return Ok(new{name=uploadModDTO.name});
+                return Ok(new { name = uploadModDTO.name });
             }
             return Ok("Değişiklik yok");
         }
@@ -188,18 +223,47 @@ namespace ProjectAPI.Controllers
         {
             var CurrentUserID = GetCurrentUserId();
             var founded = await _context.UploadFiles.FirstOrDefaultAsync(f => f.Id == id && f.UserId == CurrentUserID);
-            
+
             if (founded == null)
                 return NotFound();
-
-            _context.UploadFiles.Remove(founded);
+            founded.IsDeleted = true;
             await _context.SaveChangesAsync();
-            if (founded.filename != null)
-                _fileService.DeleteFile(founded.filename);
-            
+
+
             return Ok("Dosya silindi");
         }
+        [HttpPost("Recover/{id}")]
+        [Authorize]
+        [EnableRateLimiting("PerSecondLimit")]
+        public async Task<IActionResult> RecoverFile(int id)
+        {
+            var CurrentUserID = GetCurrentUserId();
+            var founded = await _context.UploadFiles.IgnoreQueryFilters().FirstOrDefaultAsync(f => f.Id == id && f.UserId == CurrentUserID);
 
+            if (founded == null)
+                return NotFound();
+            founded.IsDeleted = false;
+            await _context.SaveChangesAsync();
+            return Ok("Dosya kurtarıldı");
+        }
+        [HttpDelete("Permanent/{id}")]
+        [Authorize]
+        [EnableRateLimiting("PerSecondLimit")]
+        public async Task<IActionResult> HardDeleteFile(int id)
+        {
+            var CurrentUserID = GetCurrentUserId();
+            var founded = await _context.UploadFiles.FirstOrDefaultAsync(f => f.Id == id && f.UserId == CurrentUserID);
+
+            if (founded == null)
+                return NotFound();
+            if (founded.filename != null)
+                _fileService.DeleteFile(founded.filename);
+            _context.UploadFiles.Remove(founded);
+            await _context.SaveChangesAsync();
+
+
+            return Ok("Dosya kalıcı olarak silindi");
+        }
         [HttpDelete("DeleteFiles")]
         [Authorize]
         [EnableRateLimiting("PerSecondLimit")]
@@ -209,25 +273,23 @@ namespace ProjectAPI.Controllers
             var founded = await _context.UploadFiles.Where(p => ids.Contains(p.Id) && p.UserId == CurrentUserID).ToListAsync();
             if (founded == null)
                 return NotFound();
-            _context.UploadFiles.RemoveRange(founded);
-            await _context.SaveChangesAsync();
             foreach (var f in founded)
-                if (f.filename != null)
-                    _fileService.DeleteFile(f.filename);            
+                f.IsDeleted = true;
+            await _context.SaveChangesAsync();
             return Ok("Dosyalar silindi");
         }
         //İleride admin için bir takım yetkiler gerekebilir
         [HttpDelete("DeleteFilesByAdmin")]
-        [Authorize(Roles ="Admin")]
-        [EnableRateLimiting("PerSecondLimit")]        
+        [Authorize(Roles = "Admin")]
+        [EnableRateLimiting("PerSecondLimit")]
         public async Task<IActionResult> DeleteFilesByAdmin(int[] ids)
-        {            
-            var founded = await _context.UploadFiles.Where(p => ids.Contains(p.Id) ).ToListAsync();
+        {
+            var founded = await _context.UploadFiles.Where(p => ids.Contains(p.Id)).ToListAsync();
             if (founded == null)
-                return NotFound();            
-            foreach(var f in founded)
-            if (f.filename != null)
-                _fileService.DeleteFile(f.filename);
+                return NotFound();
+            foreach (var f in founded)
+                if (f.filename != null)
+                    _fileService.DeleteFile(f.filename);
             _context.UploadFiles.RemoveRange(founded);
             await _context.SaveChangesAsync();
             return Ok("Admin tarafından Dosyalar silindi");

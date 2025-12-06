@@ -17,6 +17,10 @@ namespace ProjectAPI.Models
         public string Bio { get; set; } = string.Empty;
         public string PasswordHashed { get; set; } = string.Empty;
         public string isRole { get; set; } = "User";
+        // --- Soft Delete İçin Eklenen Alanlar ---
+        public bool IsDeleted { get; set; } = false; // Varsayılan olarak silinmemiş
+        public DateTime? DeletedAt { get; set; }     // Ne zaman silindi?
+        // ----------------------------------------
         public ICollection<Project> Projects = new List<Project>();
         public ICollection<UploadFile> uploadFiles = new List<UploadFile>();
         // Navigasyon Özelliği (Navigation Property)

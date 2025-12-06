@@ -22,24 +22,33 @@ public class AppDbContext : DbContext
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
-
+        // User tablosu için Global Filtre
+        modelBuilder.Entity<User>().HasQueryFilter(u => !u.IsDeleted);
+        // YENİ: Project filtresi
+        modelBuilder.Entity<Project>().HasQueryFilter(p => !p.IsDeleted);
+        // YENİ: UploadFile filtresi
+        modelBuilder.Entity<UploadFile>().HasQueryFilter(uf => !uf.IsDeleted);
+        modelBuilder.Entity<ProjectCategory>()
+            .HasQueryFilter(pc => pc.Project != null && !pc.Project.IsDeleted);
+     
         modelBuilder.Entity<User>()
        .HasIndex(u => u.EMail)
        .IsUnique(); // E-posta alanının benzersiz olmasını zorunlu kılar.
-       
-     
+      
         modelBuilder.Entity<Project>()
             .HasOne(p => p.user)
             .WithMany(u => u.Projects)
-            .HasForeignKey(p => p.UserId);
+            .HasForeignKey(p => p.UserId)
+            .IsRequired(false);
         modelBuilder.Entity<UploadFile>()
             .HasOne(uf => uf.user) // UploadFiles'ın bir 'user'ı var
             .WithMany(u => u.uploadFiles) // User'ın ise birçok 'uploadFiles'ı var
             .HasForeignKey(uf => uf.UserId) // 'UploadFiles' üzerindeki yabancı anahtar 'UserId'dir
-            .OnDelete(DeleteBehavior.Restrict); // ÖNEMLİ: Bir User silinmeye çalışılırsa 
+            .OnDelete(DeleteBehavior.Restrict) // ÖNEMLİ: Bir User silinmeye çalışılırsa 
                                                 // ama hala yüklediği dosyaları varsa,
                                                 // veritabanı bu silme işlemini engeller.
                                                 // (Eğer 'Cascade' yapsaydınız, user silinince tüm dosyaları da silinirdi)
+            .IsRequired(false); 
         modelBuilder.Entity<Project>()
                 .HasMany(p => p.Files) // Project'in birçok 'Files'ı var
                 .WithMany(uf => uf.Projects) // UploadFiles'ın da birçok 'Projects'i var
@@ -54,7 +63,7 @@ public class AppDbContext : DbContext
             // Foreign Key olarak RefreshToken sınıfındaki UserID alanını kullan
             .HasForeignKey(rt => rt.UserID)
             // Foreign Key'in zorunlu olduğunu belirtir
-            .IsRequired();
+            .IsRequired(false);
         modelBuilder.Entity<RefreshToken>()
             .HasKey(rt => rt.id);
         // İlişkiler de burada tanımlanır (Kategori-Urun gibi)
@@ -70,7 +79,8 @@ public class AppDbContext : DbContext
             Id = Guid.Parse(ADMIN_USER_ID),
             UserName = "admin",
             EMail = "admin@projectapi.com",
-            isRole = "Admin"
+            isRole = "Admin",
+            IsDeleted = false,
             // Diğer zorunlu alanlar varsa burada doldurmalısın.
         };
 

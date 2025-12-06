@@ -173,11 +173,12 @@ namespace ProjectAPI.Controllers
             return CreatedAtAction(nameof(GetProject), new { id = project.Id }, projectDto);
         }
 
-        // PATCH: api/Projects/5
+        // PATCH: api/Projects/5        
         [HttpPatch("{id}")]
         [Authorize]
         public async Task<IActionResult> UpdateProject(int id, ProjectUpdateDto projectUpdate)
         {
+            var currentUserRole = User.FindFirstValue(ClaimTypes.Role);
             if (id != projectUpdate.id)
             {
                 return BadRequest("ID uyuşmazlığı. Route'taki ID ile gövdedeki ID aynı olmalıdır.");
@@ -238,6 +239,12 @@ namespace ProjectAPI.Controllers
             existingProject.Content = projectUpdate.content ?? existingProject.Content;
             existingProject.isAlive = projectUpdate.isAlive ?? existingProject.isAlive;
             existingProject.StatusId = projectUpdate.statusID ?? existingProject.StatusId;
+            if(currentUserRole=="Admin")
+            existingProject.StartingDate = projectUpdate.date ?? existingProject.StartingDate;
+            else
+            {
+                return Forbid();
+            }
             existingProject.LastModificationDate = DateTime.UtcNow;
             // existingProject.UserId ve StartingDate'e dokunmuyoruz.
 
@@ -270,12 +277,49 @@ namespace ProjectAPI.Controllers
             {
                 return Forbid();
             }
+            project.IsDeleted=true;
+            //_context.Projects.Remove(project);
+            await _context.SaveChangesAsync();
 
+            return NoContent();
+        }
+        [HttpDelete("Permanent/{id}")]
+        [Authorize(Roles ="Admin")]
+        public async Task<IActionResult> HardDeleteProject(int id)
+        {
+            var project = await _context.Projects.IgnoreQueryFilters().FirstOrDefaultAsync((u)=>u.Id== id);
+
+            if (project == null)
+            {
+                return NotFound();
+            }
+                       
             _context.Projects.Remove(project);
             await _context.SaveChangesAsync();
 
             return NoContent();
         }
-        
+        [HttpPost("Recover/{id}")]
+        [Authorize]
+        public async Task<IActionResult> RecoverProject(int id)
+        {
+            var project = await _context.Projects.IgnoreQueryFilters().FirstOrDefaultAsync(p=>p.Id==id);
+
+            if (project == null)
+            {
+                return NotFound();
+            }
+
+            // --- YETKİ KONTROLÜ (Mükemmel) ---
+            if (!IsAuthorizedToManageProject(project.UserId))
+            {
+                return Forbid();
+            }
+            project.IsDeleted=false;
+            //_context.Projects.Remove(project);
+            await _context.SaveChangesAsync();
+
+            return NoContent();
+        }
     }
 }

@@ -20,6 +20,7 @@ namespace ProjectAPI.Models
         public DateOnly StartingDate { get; set; }
         public DateTime LastModificationDate { get; set; } = DateTime.UtcNow;
         public User user { get; set; } = null!;
+        public bool IsDeleted { get; set; } = false;
         public ProjectStatusMsg? Status { get; set; }
         public ICollection<ProjectCategory>? ProjectCategories { get; set; }
      public ICollection<UploadFile> Files { get; set; } = new List<UploadFile>();

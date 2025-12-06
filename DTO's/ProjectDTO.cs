@@ -44,6 +44,7 @@ namespace ProjectAPI.DTOs
         public int? statusID { get; set; } = 1;
         public List<int> categoryIds { get; set; } = new List<int>();
         public DateOnly? date { get; set; }
+        
 
     }
 }
