@@ -145,7 +145,7 @@
                // --- PROJECTS (GÜNCELLENDİ) ---
                 { section: "ProjectController", method: "GET", path: "/api/Projects?page=1&length=10", description: "Projeleri sayfalı şekilde listeler. İlişkili kategori ve durum bilgisini içerir.", auth: "Herkese Açık" },
                 { section: "ProjectController", method: "GET", path: "/api/Projects/{id}", description: "Spesifik bir projenin detaylarını getirir.", auth: "Herkese Açık" },
-                { section: "ProjectController", method: "GET", path: "/api/MyProjects/page=1&length=10", description: "Kullanıcının Projelerini sayfalı şekilde listeler. İlişkili kategori ve durum bilgisini içerir.", auth: "Token Gerekli (Sahip/Admin)" },
+                { section: "ProjectController", method: "GET", path: "/api/Projects/MyProjects/page=1&length=10", description: "Kullanıcının Projelerini sayfalı şekilde listeler. İlişkili kategori ve durum bilgisini içerir.", auth: "Token Gerekli (Sahip/Admin)" },
                 { section: "ProjectController", method: "POST", path: "/api/Projects", description: "Yeni proje oluşturur. `categoryIds` listesi ile kategori atanabilir.", auth: "Token Gerekli" },
                 { section: "ProjectController", method: "PATCH", path: "/api/Projects/{id}", description: "Proje bilgilerini günceller. Sadece Proje Sahibi veya Admin yapabilir.", auth: "Token Gerekli (Sahip/Admin)" },
                 { section: "ProjectController", method: "DELETE", path: "/api/Projects/{id}", description: "Projeyi 'Soft Delete' ile siler (Arşivler). Veritabanından silinmez.", auth: "Token Gerekli (Sahip/Admin)" },
