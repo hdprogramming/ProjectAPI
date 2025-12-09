@@ -234,6 +234,7 @@ namespace ProjectAPI.Controllers
             // Eğer işlem yapılan ID, giriş yapan kullanıcıya aitse VEYA kullanıcı Admin rolündeyse yetkilidir.
             return targetUserId == currentUserId || currentUserRole == "Admin";
         }
+        
     }
     
 }

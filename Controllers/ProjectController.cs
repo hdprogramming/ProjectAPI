@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using ProjectAPI.Models;
 using System.Security.Claims;
 using ProjectAPI.DTOs;
+
 namespace ProjectAPI.Controllers
 {
     [ApiController]
@@ -32,7 +33,10 @@ namespace ProjectAPI.Controllers
             }
             return null;
         }
-
+        private string? getCurrentUserRole()
+        {
+            return User.FindFirstValue(ClaimTypes.Role);
+        }
         /// <summary>
         /// Giriş yapan kullanıcının verilen projeyi yönetme yetkisi olup olmadığını kontrol eder.
         /// Ya projenin sahibi olmalı ya da "Admin" rolüne sahip olmalıdır.
@@ -45,7 +49,7 @@ namespace ProjectAPI.Controllers
             // Eğer giriş yapan kullanıcı projenin sahibiyse VEYA Admin rolündeyse yetkilidir.
             return currentUserId.HasValue && (currentUserId.Value == projectOwnerId || currentUserRole == "Admin");
         }
-
+         
         // --------------------------------------------------------------------------------
 
         // GET: api/Projects
@@ -83,9 +87,74 @@ namespace ProjectAPI.Controllers
             // Doğrudan List<ProjectDto> dönüyoruz
             return Ok(projects);
         }
+        [HttpGet("MyProjects")]
+        [Authorize]
+        public async Task<ActionResult<IEnumerable<ProjectDto>>> GetMyProjects(int page=1,int length=10)
+        {
+            Guid? userid=GetCurrentUserId();
+            var currentUserRole = getCurrentUserRole();
 
+            if(userid==null)
+            return Forbid();
+          
+            if (page <= 0) page = 1;
+            if (length <= 0) length = 10;
+            const int maxSayfaBoyutu = 100;
+        if (length > maxSayfaBoyutu) length = maxSayfaBoyutu;
+            
+            List<ProjectDto> projects;
+            if(currentUserRole=="User")
+            projects = await _context.Projects.Where((p)=>p.UserId==userid).Include(p => p.ProjectCategories)
+        .Include(p => p.Status).OrderDescending()
+            .Select(p => new ProjectDto
+            {
+                // Temel Alanlar
+                id = p.Id,
+                title = p.Title,
+                icon = p.Icon,
+                description = p.Description,
+                content = p.Content,
+                isAlive = p.isAlive,
+                date = p.StartingDate,
+                lastdate = p.LastModificationDate,
+                status = p.Status.Name
+            ,
+                statusID = p.Status.Id,
+
+                categoryIds = p.ProjectCategories
+            .Select(pc => pc.Category.Id).ToList()
+            }).Skip((page-1) * length).Take(length)
+    .ToListAsync();
+    else if(currentUserRole=="Admin")  
+            projects = await _context.Projects.Include(p => p.ProjectCategories)
+        .Include(p => p.Status).OrderDescending()
+            .Select(p => new ProjectDto
+            {
+                // Temel Alanlar
+                id = p.Id,
+                title = p.Title,
+                icon = p.Icon,
+                description = p.Description,
+                content = p.Content,
+                isAlive = p.isAlive,
+                date = p.StartingDate,
+                lastdate = p.LastModificationDate,
+                status = p.Status.Name
+            ,
+                statusID = p.Status.Id,
+
+                categoryIds = p.ProjectCategories
+            .Select(pc => pc.Category.Id).ToList()
+            }).Skip((page-1) * length).Take(length)
+    .ToListAsync();
+            // Doğrudan List<ProjectDto> dönüyoruz
+            else //Herhangi rol yoksa boş değer dönüyoruz
+            projects=new List<ProjectDto>();
+            return Ok(projects);
+        }
         // GET: api/Projects/5
         [HttpGet("{id}")]
+        
         public async Task<ActionResult<ProjectDto>> GetProject(int id)
         {
             var p = await _context.Projects
