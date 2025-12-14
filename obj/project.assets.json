@@ -4725,11 +4725,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\HAKKI88\\Desktop\\Proje\\Backend\\ProjectAPI\\ProjectAPI\\ProjectAPI.csproj",
+      "projectUniqueName": "C:\\Users\\HAKKI88\\Desktop\\özel\\Proje\\Backend\\ProjectAPI\\ProjectAPI\\ProjectAPI.csproj",
       "projectName": "ProjectAPI",
-      "projectPath": "C:\\Users\\HAKKI88\\Desktop\\Proje\\Backend\\ProjectAPI\\ProjectAPI\\ProjectAPI.csproj",
+      "projectPath": "C:\\Users\\HAKKI88\\Desktop\\özel\\Proje\\Backend\\ProjectAPI\\ProjectAPI\\ProjectAPI.csproj",
       "packagesPath": "C:\\Users\\HAKKI88\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\HAKKI88\\Desktop\\Proje\\Backend\\ProjectAPI\\ProjectAPI\\obj\\",
+      "outputPath": "C:\\Users\\HAKKI88\\Desktop\\özel\\Proje\\Backend\\ProjectAPI\\ProjectAPI\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"

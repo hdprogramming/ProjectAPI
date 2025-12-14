@@ -42,7 +42,7 @@ namespace ProjectAPI.Controllers
         // POST: api/Upload/Image
         [HttpPost("Image")]
         [Authorize]
-        [EnableRateLimiting("PerSecondLimit")]
+      
         public async Task<IActionResult> UploadImage([FromForm] UploadImageDTO uploadImage)
         {
             var userIdString = User.FindFirstValue(ClaimTypes.NameIdentifier);
@@ -59,6 +59,11 @@ namespace ProjectAPI.Controllers
             }
             try
             {
+                 // URL oluşturma kısmı
+                var scheme = HttpContext.Request.Scheme;
+                var host = HttpContext.Request.Host.Value;
+                var pathBase = HttpContext.Request.PathBase.Value;
+                var baseUrl = $"{scheme}://{host}{pathBase}";
                 if (uploadImage.image?.Length > 3 * 1024 * 1024)
                 {
                     return StatusCode(StatusCodes.Status400BadRequest, "File size should not exceed 3 MB");
@@ -92,9 +97,7 @@ namespace ProjectAPI.Controllers
                     // 3. Projenin var olup olmadığını KONTROL ET
                     if (project == null)
                     {
-
                         return BadRequest($"ID'si {projectId} olan proje bulunamadı.");
-
                     }
                     else
                     {
@@ -104,7 +107,7 @@ namespace ProjectAPI.Controllers
                 _context.UploadFiles.Add(newFileRecord);
                 //
                 await _context.SaveChangesAsync();
-                return Ok(new { url = fileUrl });
+                return Ok(new { url = $"{baseUrl}/Uploads/{newFileRecord.filename}" });
             }
             catch (System.Exception error)
             {
@@ -200,8 +203,7 @@ namespace ProjectAPI.Controllers
             }
         }
         [HttpPut("Update/{id}")]
-        [Authorize]
-        [EnableRateLimiting("PerSecondLimit")]
+        [Authorize]      
         public async Task<IActionResult> ModifyFile(int id, UploadModDTO uploadModDTO)
         {
             var foundedfile = await _context.UploadFiles.FirstAsync(up => up.Id == id);
@@ -218,7 +220,7 @@ namespace ProjectAPI.Controllers
         }
         [HttpDelete("Delete/{id}")]
         [Authorize]
-        [EnableRateLimiting("PerSecondLimit")]
+      
         public async Task<IActionResult> DeleteFile(int id)
         {
             var CurrentUserID = GetCurrentUserId();
@@ -234,7 +236,7 @@ namespace ProjectAPI.Controllers
         }
         [HttpPost("Recover/{id}")]
         [Authorize]
-        [EnableRateLimiting("PerSecondLimit")]
+      
         public async Task<IActionResult> RecoverFile(int id)
         {
             var CurrentUserID = GetCurrentUserId();
@@ -248,11 +250,11 @@ namespace ProjectAPI.Controllers
         }
         [HttpDelete("Permanent/{id}")]
         [Authorize]
-        [EnableRateLimiting("PerSecondLimit")]
+      
         public async Task<IActionResult> HardDeleteFile(int id)
         {
             var CurrentUserID = GetCurrentUserId();
-            var founded = await _context.UploadFiles.FirstOrDefaultAsync(f => f.Id == id && f.UserId == CurrentUserID);
+            var founded = await _context.UploadFiles.IgnoreQueryFilters().FirstOrDefaultAsync(f => f.Id == id && f.UserId == CurrentUserID);
 
             if (founded == null)
                 return NotFound();
@@ -266,7 +268,7 @@ namespace ProjectAPI.Controllers
         }
         [HttpDelete("DeleteFiles")]
         [Authorize]
-        [EnableRateLimiting("PerSecondLimit")]
+      
         public async Task<IActionResult> DeleteFiles(int[] ids)
         {
             var CurrentUserID = GetCurrentUserId();
@@ -281,7 +283,7 @@ namespace ProjectAPI.Controllers
         //İleride admin için bir takım yetkiler gerekebilir
         [HttpDelete("DeleteFilesByAdmin")]
         [Authorize(Roles = "Admin")]
-        [EnableRateLimiting("PerSecondLimit")]
+      
         public async Task<IActionResult> DeleteFilesByAdmin(int[] ids)
         {
             var founded = await _context.UploadFiles.Where(p => ids.Contains(p.Id)).ToListAsync();

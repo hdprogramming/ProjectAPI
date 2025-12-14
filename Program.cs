@@ -36,7 +36,7 @@ builder.Services.AddRateLimiter(options =>
             partitionKey: partitionKey,
             factory: _ => new FixedWindowRateLimiterOptions
             {
-                PermitLimit = 10,                 // İzin verilen istek sayısı: 10
+                PermitLimit = 50,                 // İzin verilen istek sayısı: 10
                 Window = TimeSpan.FromSeconds(1), // Pencere süresi: 1 saniye
                 QueueLimit = 0                    // Kuyruk boyutu: 0 (Limit aşılırsa hemen 429 döndürülür)
             }
@@ -147,7 +147,7 @@ app.UseRateLimiter();
 app.UseCors("MyAllowSpecificOrigins");
 app.UseAuthentication();
 app.UseAuthorization();
-app.MapControllers();
+app.MapControllers().RequireRateLimiting("PerSecondLimit");
 app.Run();
 
 

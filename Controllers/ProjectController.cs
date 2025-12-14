@@ -152,6 +152,71 @@ namespace ProjectAPI.Controllers
             projects=new List<ProjectDto>();
             return Ok(projects);
         }
+         [HttpGet("MyDeletedProjects")]
+        [Authorize]
+        public async Task<ActionResult<IEnumerable<ProjectDto>>> GetMyDeletedProjects(int page=1,int length=10)
+        {
+            Guid? userid=GetCurrentUserId();
+            var currentUserRole = getCurrentUserRole();
+
+            if(userid==null)
+            return Forbid();
+          
+            if (page <= 0) page = 1;
+            if (length <= 0) length = 10;
+            const int maxSayfaBoyutu = 100;
+        if (length > maxSayfaBoyutu) length = maxSayfaBoyutu;
+            
+            List<ProjectDto> projects;
+            if(currentUserRole=="User")
+            projects = await _context.Projects.IgnoreQueryFilters().Where((p)=>p.UserId==userid && p.IsDeleted==true).Include(p => p.ProjectCategories)
+        .Include(p => p.Status).OrderDescending()
+            .Select(p => new ProjectDto
+            {
+                // Temel Alanlar
+                id = p.Id,
+                title = p.Title,
+                icon = p.Icon,
+                description = p.Description,
+                content = p.Content,
+                isAlive = p.isAlive,
+                date = p.StartingDate,
+                lastdate = p.LastModificationDate,
+                status = p.Status.Name
+            ,
+                statusID = p.Status.Id,
+
+                categoryIds = p.ProjectCategories
+            .Select(pc => pc.Category.Id).ToList()
+            }).Skip((page-1) * length).Take(length)
+    .ToListAsync();
+    else if(currentUserRole=="Admin")  
+            projects = await _context.Projects.IgnoreQueryFilters().Where((p)=>p.IsDeleted==true).Include(p => p.ProjectCategories)
+        .Include(p => p.Status).OrderDescending()
+            .Select(p => new ProjectDto
+            {
+                // Temel Alanlar
+                id = p.Id,
+                title = p.Title,
+                icon = p.Icon,
+                description = p.Description,
+                content = p.Content,
+                isAlive = p.isAlive,
+                date = p.StartingDate,
+                lastdate = p.LastModificationDate,
+                status = p.Status.Name
+            ,
+                statusID = p.Status.Id,
+
+                categoryIds = p.ProjectCategories
+            .Select(pc => pc.Category.Id).ToList()
+            }).Skip((page-1) * length).Take(length)
+    .ToListAsync();
+            // Doğrudan List<ProjectDto> dönüyoruz
+            else //Herhangi rol yoksa boş değer dönüyoruz
+            projects=new List<ProjectDto>();
+            return Ok(projects);
+        }
         // GET: api/Projects/5
         [HttpGet("{id}")]
         
@@ -262,7 +327,7 @@ namespace ProjectAPI.Controllers
                 return NotFound();
             }
 
-            // --- YETKİ KONTROLÜ (Mükemmel) ---
+            // --- YETKİ KONTROLÜ ---
             if (!IsAuthorizedToManageProject(existingProject.UserId))
             {
                 return Forbid();
@@ -308,12 +373,15 @@ namespace ProjectAPI.Controllers
             existingProject.Content = projectUpdate.content ?? existingProject.Content;
             existingProject.isAlive = projectUpdate.isAlive ?? existingProject.isAlive;
             existingProject.StatusId = projectUpdate.statusID ?? existingProject.StatusId;
-            if(currentUserRole=="Admin")
-            existingProject.StartingDate = projectUpdate.date ?? existingProject.StartingDate;
-            else
+            if(projectUpdate.date!=null)
+            {
+                 if(currentUserRole!="Admin")
             {
                 return Forbid();
             }
+              existingProject.StartingDate = projectUpdate.date ?? existingProject.StartingDate;
+             }
+           
             existingProject.LastModificationDate = DateTime.UtcNow;
             // existingProject.UserId ve StartingDate'e dokunmuyoruz.
 
