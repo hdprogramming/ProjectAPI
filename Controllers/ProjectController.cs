@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using ProjectAPI.Models;
 using System.Security.Claims;
 using ProjectAPI.DTOs;
+using Ganss.XSS;
 
 namespace ProjectAPI.Controllers
 {
@@ -12,10 +13,12 @@ namespace ProjectAPI.Controllers
     public class ProjectsController : ControllerBase
     {
         private readonly AppDbContext _context;
+        private readonly IHtmlSanitizer _sanitizer; 
 
-        public ProjectsController(AppDbContext context)
+        public ProjectsController(AppDbContext context,IHtmlSanitizer htmlSanitizer)
         {
             _context = context;
+            _sanitizer=htmlSanitizer;            
         }
 
         // --- Yardımcı Metotlar ---
@@ -260,7 +263,7 @@ namespace ProjectAPI.Controllers
         public async Task<ActionResult<ProjectCreateDto>> CreateProject(ProjectCreateDto projectDto)
         {
             var currentUserId = GetCurrentUserId();
-
+ 
             if (!currentUserId.HasValue)
             {
                 return Unauthorized("Kullanıcı kimliği doğrulanamadı.");
@@ -272,13 +275,14 @@ namespace ProjectAPI.Controllers
             {
                 return BadRequest("Seçilen bazı kategori ID'leri geçersizdir.");
             }
+            
             // DTO'dan Entity'ye dönüştür
             var project = new Project
             {
                 Title = projectDto.title!, // Null kontrolünü DTO'da Required ile yapın
                 Icon = projectDto.icon,
                 Description = projectDto.description,
-                Content = projectDto.content,
+                Content = _sanitizer.Sanitize(projectDto.content),
                 isAlive = projectDto.isAlive,
                 UserId = currentUserId.Value, // Güvenlik: Token'dan gelen ID kullanılır
                 StartingDate = DateOnly.FromDateTime(DateTime.UtcNow),
@@ -365,12 +369,12 @@ namespace ProjectAPI.Controllers
                     });
                 }
             }
-            // Güncelleme alanlarını eşle
-
+            
+            // Güncelleme alanlarını eşle            
             existingProject.Icon = projectUpdate.icon ?? existingProject.Icon;
             existingProject.Title = projectUpdate.title ?? existingProject.Title;
             existingProject.Description = projectUpdate.description ?? existingProject.Description;
-            existingProject.Content = projectUpdate.content ?? existingProject.Content;
+            existingProject.Content = _sanitizer.Sanitize(projectUpdate.content ?? existingProject.Content);
             existingProject.isAlive = projectUpdate.isAlive ?? existingProject.isAlive;
             existingProject.StatusId = projectUpdate.statusID ?? existingProject.StatusId;
             if(projectUpdate.date!=null)
@@ -421,7 +425,6 @@ namespace ProjectAPI.Controllers
             return NoContent();
         }
         [HttpDelete("Permanent/{id}")]
-        [Authorize(Roles ="Admin")]
         public async Task<IActionResult> HardDeleteProject(int id)
         {
             var project = await _context.Projects.IgnoreQueryFilters().FirstOrDefaultAsync((u)=>u.Id== id);
@@ -430,7 +433,11 @@ namespace ProjectAPI.Controllers
             {
                 return NotFound();
             }
-                       
+             // --- YETKİ KONTROLÜ (Mükemmel) ---
+            if (!IsAuthorizedToManageProject(project.UserId))
+            {
+                return Forbid();
+            }           
             _context.Projects.Remove(project);
             await _context.SaveChangesAsync();
 

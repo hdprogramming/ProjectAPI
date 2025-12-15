@@ -340,3 +340,6 @@ C:\Users\HAKKI88\Desktop\özel\Proje\Backend\ProjectAPI\ProjectAPI\obj\Debug\net
 C:\Users\HAKKI88\Desktop\özel\Proje\Backend\ProjectAPI\ProjectAPI\obj\Debug\net8.0\ProjectAPI.pdb
 C:\Users\HAKKI88\Desktop\özel\Proje\Backend\ProjectAPI\ProjectAPI\obj\Debug\net8.0\ProjectAPI.genruntimeconfig.cache
 C:\Users\HAKKI88\Desktop\özel\Proje\Backend\ProjectAPI\ProjectAPI\obj\Debug\net8.0\ref\ProjectAPI.dll
+C:\Users\HAKKI88\Desktop\özel\Proje\Backend\ProjectAPI\ProjectAPI\bin\Debug\net8.0\AngleSharp.dll
+C:\Users\HAKKI88\Desktop\özel\Proje\Backend\ProjectAPI\ProjectAPI\bin\Debug\net8.0\AngleSharp.Css.dll
+C:\Users\HAKKI88\Desktop\özel\Proje\Backend\ProjectAPI\ProjectAPI\bin\Debug\net8.0\HtmlSanitizer.dll

@@ -14,6 +14,7 @@ using Microsoft.OpenApi.Models;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.AspNetCore.HttpOverrides;
 using System.Threading.RateLimiting;
+using Ganss.XSS;
 //Admin Email:admin@projectapi.com
 //Admin Şifre:Admin123+
 var builder = WebApplication.CreateBuilder(args);
@@ -98,7 +99,7 @@ builder.Services.AddCors(options =>
                    .AllowCredentials();                  // 👈 KRİTİK AYAR: Çerezlerin (Cookies) gönderilmesine izin ver!
          });
 });
-
+builder.Services.AddSingleton<IHtmlSanitizer, HtmlSanitizer>();
 var jwtSection = builder.Configuration.GetSection("Jwt");
 var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSection["SecurityKey"]!));
 

@@ -1,11 +1,14 @@
 {
   "version": 2,
-  "dgSpecHash": "YxGNZwd2Yjg=",
+  "dgSpecHash": "bAwiFf0eaqg=",
   "success": true,
   "projectFilePath": "C:\\Users\\HAKKI88\\Desktop\\özel\\Proje\\Backend\\ProjectAPI\\ProjectAPI\\ProjectAPI.csproj",
   "expectedPackageFiles": [
+    "C:\\Users\\HAKKI88\\.nuget\\packages\\anglesharp\\0.16.1\\anglesharp.0.16.1.nupkg.sha512",
+    "C:\\Users\\HAKKI88\\.nuget\\packages\\anglesharp.css\\0.16.1\\anglesharp.css.0.16.1.nupkg.sha512",
     "C:\\Users\\HAKKI88\\.nuget\\packages\\azure.core\\1.38.0\\azure.core.1.38.0.nupkg.sha512",
     "C:\\Users\\HAKKI88\\.nuget\\packages\\azure.identity\\1.11.4\\azure.identity.1.11.4.nupkg.sha512",
+    "C:\\Users\\HAKKI88\\.nuget\\packages\\htmlsanitizer\\6.0.453\\htmlsanitizer.6.0.453.nupkg.sha512",
     "C:\\Users\\HAKKI88\\.nuget\\packages\\humanizer.core\\2.14.1\\humanizer.core.2.14.1.nupkg.sha512",
     "C:\\Users\\HAKKI88\\.nuget\\packages\\microsoft.aspnetcore.authentication.jwtbearer\\8.0.0\\microsoft.aspnetcore.authentication.jwtbearer.8.0.0.nupkg.sha512",
     "C:\\Users\\HAKKI88\\.nuget\\packages\\microsoft.aspnetcore.openapi\\8.0.10\\microsoft.aspnetcore.openapi.8.0.10.nupkg.sha512",
@@ -54,6 +57,7 @@
     "C:\\Users\\HAKKI88\\.nuget\\packages\\swashbuckle.aspnetcore.swagger\\9.0.6\\swashbuckle.aspnetcore.swagger.9.0.6.nupkg.sha512",
     "C:\\Users\\HAKKI88\\.nuget\\packages\\swashbuckle.aspnetcore.swaggergen\\9.0.6\\swashbuckle.aspnetcore.swaggergen.9.0.6.nupkg.sha512",
     "C:\\Users\\HAKKI88\\.nuget\\packages\\swashbuckle.aspnetcore.swaggerui\\9.0.6\\swashbuckle.aspnetcore.swaggerui.9.0.6.nupkg.sha512",
+    "C:\\Users\\HAKKI88\\.nuget\\packages\\system.buffers\\4.5.1\\system.buffers.4.5.1.nupkg.sha512",
     "C:\\Users\\HAKKI88\\.nuget\\packages\\system.clientmodel\\1.0.0\\system.clientmodel.1.0.0.nupkg.sha512",
     "C:\\Users\\HAKKI88\\.nuget\\packages\\system.codedom\\6.0.0\\system.codedom.6.0.0.nupkg.sha512",
     "C:\\Users\\HAKKI88\\.nuget\\packages\\system.collections.immutable\\7.0.0\\system.collections.immutable.7.0.0.nupkg.sha512",
@@ -87,5 +91,16 @@
     "C:\\Users\\HAKKI88\\.nuget\\packages\\system.threading.tasks.extensions\\4.5.4\\system.threading.tasks.extensions.4.5.4.nupkg.sha512",
     "C:\\Users\\HAKKI88\\.nuget\\packages\\system.windows.extensions\\6.0.0\\system.windows.extensions.6.0.0.nupkg.sha512"
   ],
-  "logs": []
+  "logs": [
+    {
+      "code": "NU1902",
+      "level": "Warning",
+      "warningLevel": 1,
+      "message": "'HtmlSanitizer' 6.0.453 paketinde önem derecesi orta olan bilinen bir https://github.com/advisories/GHSA-43cp-6p3q-2pc4 güvenlik açığı var",
+      "libraryId": "HtmlSanitizer",
+      "targetGraphs": [
+        "net8.0"
+      ]
+    }
+  ]
 }

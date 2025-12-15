@@ -73,11 +73,14 @@ namespace ProjectAPI.Controllers
                     return BadRequest("Image eklenmemiş");
                 string createdImageName = await _fileService.SaveFileAsync(uploadImage.image, allowedFileExtentions);
                 var fileUrl = $"/Uploads/{createdImageName}";
+                //Maksimum 20 Harf'ten oluşsun
+                string imagename=uploadImage.name ?? createdImageName;
+                if(imagename.Length>20)
+                imagename=imagename.Substring(0,20)+"...";
                 var newFileRecord = new UploadFile
                 {
-                    name = uploadImage.name ?? createdImageName,
-                    filename = createdImageName, // Veya orijinal dosya adı, size kalmış
-                                                 // Burası en önemli kısım!
+                    name = imagename,
+                    filename = createdImageName,                                                  
                     UserId = userGuid
                 };
                 //Eğer projede kullanıldıysa o projede kullanılan dosyaların takibi için
