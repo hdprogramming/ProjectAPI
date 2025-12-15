@@ -1,90 +1,67 @@
-## ProjectAPI
+Markdown
 
-> Bu proje, bilimsel çalışmalarınızın kaydı için geliştirilmiş, **.NET 8.0** altyapısını kullanan güçlü ve ölçeklenebilir bir **RESTful API** servisidir. İleride yeni özellikler eklenecek ve iyileştirmeler yapılacaktır.
+# ProjectCLVue 🚀
 
-[](https://www.google.com/search?q=https://github.com/hdprogramming/ProjectAPI/blob/main/LICENSE)
-[](https://www.google.com/search?q=https://github.com/hdprogramming/ProjectAPI/stargazers)
-[](https://www.google.com/search?q=https://github.com/hdprogramming/ProjectAPI/commits/main)
+Bu proje, **Vue 3** ve **Vite** kullanılarak geliştirilmiş modern bir frontend uygulamasıdır. İçerisinde dosya yönetimi, metin editörü (Quill) ve güvenli veri işleme yapıları barındırır.
 
------
+> ⚠️ **DİKKAT: Geliştirme Süreci Devam Ediyor!** > Bu proje şu anda aktif geliştirme aşamasındadır (WIP). Bazı özellikler tamamlanmamış olabilir veya ciddi hatalar (bug) içerebilir. Kullanırken veya incelerken bunu göz önünde bulundurunuz.
 
-### 🌟 Özellikler
+## 🛠️ Önerilen IDE Kurulumu
 
-  * **RESTful Mimari:** CRUD operasyonları için standart HTTP metodlarının kullanımı.
-  * **Hızlı ve Güvenilir:** Performans için optimize edilmiş **.NET 8.0** altyapısı.
-  * **OpenAPI Desteği:** Swagger UI aracılığıyla uç nokta testleri ve otomatik dökümantasyon.
-  * **Katmanlı Mimari:** Sürdürülebilirlik ve test edilebilirlik için ayrılmış katmanlar (Örn: Repository/Service Pattern).
-  * **Veritabanı Entegrasyonu:** [Entity Framework Core].
+Bu proje için en verimli geliştirme ortamı:
 
------
+- [VS Code](https://code.visualstudio.com/) 
+- [Vue - Official](https://marketplace.visualstudio.com/items?itemName=Vue.volar) eklentisi.
+  - *Not: Eğer yüklüyse `Vetur` eklentisini devre dışı bırakın.*
 
-### 🛠️ Kullanılan Teknolojiler
+## 🌐 Önerilen Tarayıcı Kurulumu
 
-Bu API projesinde aşağıdaki temel teknolojiler ve kütüphaneler kullanılmıştır:
+Vue 3 reaktivite sistemini ve değişkenleri rahatça inceleyebilmek için:
 
-  * **Backend Framework:** [.NET 8.0 (ASP.NET Core API)](https://dotnet.microsoft.com/en-us/download/dotnet/8.0)
-  * **Programlama Dili:** C\#
-  * **Veritabanı:** [MSSQL Server]
-  * **ORM:** [Entity Framework Core]
-  * **Dökümantasyon:** Swashbuckle (Swagger UI)
+### Chromium Tabanlı Tarayıcılar (Chrome, Edge, Brave vb.)
+1. [Vue.js devtools](https://chrome.google.com/webstore/detail/vuejs-devtools/nhdogjmejiglipccpnnnanhbledajbpd) eklentisini yükleyin.
+2. **Chrome DevTools** Ayarlarını açın (F12 -> Ayarlar).
+3. "Console" bölümü altındaki **"Enable custom formatters"** seçeneğini işaretleyin.
 
------
+### Firefox
+1. [Vue.js devtools](https://addons.mozilla.org/en-US/firefox/addon/vue-js-devtools/) eklentisini yükleyin.
+2. **Firefox DevTools** Ayarlarını açın.
+3. **"Enable custom formatters"** seçeneğini aktif hale getirin.
 
-### 📦 Kurulum ve Çalıştırma
+## ⚙️ Proje Kurulumu
 
-Projenin yerel makinenizde geliştirme ortamında çalıştırılması için aşağıdaki adımları izleyin.
+Projeyi klonladıktan sonra gerekli bağımlılıkları yüklemek için terminalde şu komutu çalıştırın:
 
-#### 📝 Ön Koşullar
+```sh
+npm install
+Geliştirme Modunda Çalıştırma (Hot-Reload)
+Projeyi yerel sunucuda başlatmak ve anlık değişiklikleri görmek için:
 
-Sisteminizde aşağıdaki yazılımların kurulu olması gerekmektedir:
+Bash
 
-  * [.NET 8.0 SDK](https://dotnet.microsoft.com/en-us/download/dotnet/8.0) veya daha yenisi.
-  * Tercih edilen bir IDE (Örn: Visual Studio, Visual Studio Code, JetBrains Rider).
-  * Database için https://www.microsoft.com/tr-tr/sql-server/sql-server-downloads
+npm run dev
+Canlı Ortam İçin Derleme (Production Build)
+Projeyi yayına hazırlamak, sıkıştırmak ve optimize etmek için:
 
-#### ⚙️ Adımlar
+Bash
 
-1.  **Projeyi Klonlayın:**
-    ```bash
-    git clone https://github.com/hdprogramming/ProjectAPI.git
-    cd ProjectAPI/ProjectAPI # Ana .csproj dosyasının olduğu dizine girin
-    ```
-2.  **Ortam Ayarlarını Yapılandırın:**
-      * `appsettings.Development.json` dosyasını açın.
-      * **Veritabanı Bağlantı Dizesini (`ConnectionStrings`)** kendi yerel veritabanı ayarlarınıza göre güncelleyin.
-      * Program.cs içindeki satırı bulup <code>policy.WithOrigins("Buraya FrontEnd sunucunuzun adresi gelecek mesela http://localhost:5173 gibi")</code> güncelleyin
- 3.  **Veritabanını Hazırlayın:**
-      * Gerekli migrasyonları uygulayın:
-        ```bash
-        dotnet ef database update
-        ```
-4.  **Projeyi Çalıştırın:**
-      * Projenin ana dizinindeyken (`.csproj` dosyasının olduğu yerde):
-        ```bash
-        dotnet run
-        yada dotnet watch
-        ```
-      * **Alternatif:** IDE (Visual Studio/VS Code) üzerinden `Run` veya `Debug` tuşuna basarak da çalıştırabilirsiniz.
+npm run build
+📂 Özellikler (Özet)
+Vue 3 Composition API: <script setup> yapısı ile temiz kod.
 
-#### 🌐 Erişim
+XSS Koruması: DOMPurify ile güvenli HTML render işlemleri.
 
-Uygulama varsayılan olarak şu adreslerde yayında olacaktır:
+Dosya Yöneticisi: Resim yükleme, silme ve düzenleme modülü.
 
-  * **HTTP:** `http://localhost:5000` (veya `7000` küsurlu bir port)
-  * **HTTPS:** `https://localhost:5001` (veya `7000` küsurlu bir port)
+Zengin Metin Editörü: Quill Editor entegrasyonu.
 
-Swagger dökümantasyonuna genellikle `/swagger` yolundan erişebilirsiniz: `https://localhost:5001/swagger`
+Router Yapısı: ID tabanlı dinamik sayfa yönlendirmeleri.
 
------
-
-### 🛣️ API Uç Noktaları ve Dökümantasyon
-
-Tüm mevcut uç noktaların detaylı bilgileri ve deneme ekranı, uygulama çalışır durumdayken **Swagger UI** üzerinden otomatik olarak sağlanmaktadır.
-
-Detaylar için:Dökümantasyon.html'ye bakınız
-
------
+🔧 Konfigürasyon
+Vite ayarlarını özelleştirmek için Vite Configuration Reference sayfasına bakabilirsiniz.
 
 
-
-
+### Nasıl Kullanırsın?
+1.  Proje klasöründe `README.md` adında bir dosya oluştur.
+2.  Yukarıdaki kodu kopyalayıp içine yapıştır.
+3.  Kaydet.
