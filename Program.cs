@@ -48,7 +48,7 @@ var connectionString = builder.Configuration.GetConnectionString("DefaultConnect
                        ?? throw new InvalidOperationException("Bağlantı Dizisi 'DefaultConnection' bulunamadı.");
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(connectionString));
-    
+
 builder.Services.AddTransient<IFileService, FileService>();
 builder.Services.AddSingleton<IPasswordHasher<User>, HasherUtil>();
 builder.Services.AddScoped<IJwtService, JwtService>();
@@ -93,13 +93,51 @@ builder.Services.AddCors(options =>
     options.AddPolicy(name: "MyAllowSpecificOrigins",
          policy =>
          {
-             policy.WithOrigins("http://localhost:5173","https://localhost:5173","http://localhost:3000","https://localhost:3000") // 👈 BURAYI DÜZELT: React uygulamanın TAM adresi
+             policy.WithOrigins("http://localhost:5173", "https://localhost:5173", "http://localhost:3000", "https://localhost:3000") // 👈 BURAYI DÜZELT: React uygulamanın TAM adresi
                    .AllowAnyHeader()                     // İzin verilen HTTP başlıkları
                    .AllowAnyMethod()                     // İzin verilen HTTP metotları (GET, POST, vb.)
                    .AllowCredentials();                  // 👈 KRİTİK AYAR: Çerezlerin (Cookies) gönderilmesine izin ver!
          });
 });
-builder.Services.AddSingleton<IHtmlSanitizer, HtmlSanitizer>();
+builder.Services.AddSingleton<IHtmlSanitizer>(_ =>
+{
+    var sanitizer = new HtmlSanitizer();
+
+    // --- 1. İzin Verilen Etiketler (Allowed Tags) ---
+    // Metin Formatlama
+    var tags = new List<string> { 
+        "h1", "h2", "h3", "h4", "h5", "h6", "p", "b", "i", "strong", 
+        "em", "u", "strike", "sub", "sup", "span", "div", "blockquote", "br", "hr" 
+    };
+    // Listeler
+    tags.AddRange(new[] { "ul", "ol", "li" });
+    // Tablolar
+    tags.AddRange(new[] { "table", "thead", "tbody", "tr", "th", "td" });
+    // Link ve Medya
+    tags.AddRange(new[] { "a", "img" });
+
+    foreach (var tag in tags) { sanitizer.AllowedTags.Add(tag); }
+
+    // --- 2. İzin Verilen Özellikler (Allowed Attributes) ---
+    sanitizer.AllowedAttributes.Add("class");
+    sanitizer.AllowedAttributes.Add("style");
+    sanitizer.AllowedAttributes.Add("id");
+    sanitizer.AllowedAttributes.Add("href"); // Linkler için şart
+    sanitizer.AllowedAttributes.Add("src");  // Resimler için şart
+    sanitizer.AllowedAttributes.Add("alt");
+    sanitizer.AllowedAttributes.Add("width");
+    sanitizer.AllowedAttributes.Add("height");
+    sanitizer.AllowedAttributes.Add("target"); // Linklerin yeni sekmede açılması için
+
+    // --- 3. Güvenlik Ayarları ---
+    // Sadece güvenli URL şemalarına izin ver (javascript: kodlarını engeller)
+    sanitizer.AllowedSchemes.Add("mailto");
+    sanitizer.AllowedSchemes.Add("http");
+    sanitizer.AllowedSchemes.Add("https");
+
+    return sanitizer;
+
+});
 var jwtSection = builder.Configuration.GetSection("Jwt");
 var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSection["SecurityKey"]!));
 
@@ -123,7 +161,7 @@ builder.Services.AddAuthentication(options =>
 });
 builder.Services.Configure<ForwardedHeadersOptions>(options =>
 {
-    options.ForwardedHeaders = 
+    options.ForwardedHeaders =
         ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
 });
 // Authorization servisini ekle
