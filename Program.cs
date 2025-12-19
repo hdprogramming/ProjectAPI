@@ -105,9 +105,9 @@ builder.Services.AddSingleton<IHtmlSanitizer>(_ =>
 
     // --- 1. İzin Verilen Etiketler (Allowed Tags) ---
     // Metin Formatlama
-    var tags = new List<string> { 
-        "h1", "h2", "h3", "h4", "h5", "h6", "p", "b", "i", "strong", 
-        "em", "u", "strike", "sub", "sup", "span", "div", "blockquote", "br", "hr" 
+    var tags = new List<string> {
+        "h1", "h2", "h3", "h4", "h5", "h6", "p", "b", "i", "strong",
+        "em", "u", "strike", "sub", "sup", "span", "div", "blockquote", "br", "hr"
     };
     // Listeler
     tags.AddRange(new[] { "ul", "ol", "li" });
