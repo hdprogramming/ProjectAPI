@@ -10,6 +10,10 @@ namespace ProjectAPI.DTOs
         public IFormFile? image { get; set; }
         public string? ProjectID { get; set; }
     }
+     public class UploadProfileImageDTO
+    {
+                public IFormFile? image { get; set; }
+    }
     public class UploadedFilesDTO
     {
         public int id { get; set; }

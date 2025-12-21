@@ -181,6 +181,11 @@ app.UseStaticFiles(new StaticFileOptions
            Path.Combine(builder.Environment.ContentRootPath, "Uploads")),
     RequestPath = "/Uploads"
 });
+app.UseStaticFiles(new StaticFileOptions
+{
+    FileProvider = new PhysicalFileProvider(Path.Combine(builder.Environment.ContentRootPath, "ProfileImages")),
+    RequestPath = "/ProfileImages"
+});
 app.UseHttpsRedirection();
 app.UseRateLimiter();
 app.UseCors("MyAllowSpecificOrigins");

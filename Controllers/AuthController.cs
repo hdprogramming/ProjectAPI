@@ -90,8 +90,11 @@ namespace ProjectAPI.Controllers
                 Expires = DateTimeOffset.UtcNow.AddDays(7) // Cookie geçerlilik süresi
             };
             HttpContext.Response.Cookies.Append("refreshToken", refreshToken, cookieOptions);
-
-            return Ok(new { UserID=user.Id,Token = token });
+               var request = HttpContext.Request;
+        // Şunu oluşturur: https://localhost:7123 veya https://api.site.com
+        var baseUrl = $"{request.Scheme}://{request.Host}{request.PathBase}";
+       
+            return Ok(new { UserID=user.Id,Token = token,Username=user.UserName,ProfileImageUrl=baseUrl+user.ProfileImageUrl,Role=user.isRole });
         }
         [HttpPost("Refresh")]
         public async Task<IActionResult> Refresh()

@@ -69,12 +69,14 @@ namespace ProjectAPI.Controllers
             {
                 return NotFound(); // 404 Not Found - Kullanıcı bulunamadı.
             }
-
+           var request = HttpContext.Request;
+        // Şunu oluşturur: https://localhost:7123 veya https://api.site.com
+        var baseUrl = $"{request.Scheme}://{request.Host}{request.PathBase}";
             var userDto = new UserDTODetails {
                 UserID = user.Id.ToString(),
                 UserName = user.UserName,
                 Email = user.EMail,
-                ProfileImageUrl = user.ProfileImageUrl,
+                ProfileImageUrl = baseUrl+user.ProfileImageUrl,
                 Bio=user.Bio
             };
             return Ok(userDto);

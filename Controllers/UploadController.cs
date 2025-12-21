@@ -117,6 +117,65 @@ namespace ProjectAPI.Controllers
                 return BadRequest(error.Message);
             }
         }
+        [HttpPost("ProfileImage")]
+[Authorize]
+public async Task<IActionResult> UploadProfileImage([FromForm] UploadProfileImageDTO uploadImage)
+{
+    var userId = GetCurrentUserId(); 
+    
+    // 1. Validasyonlar
+    if (uploadImage.image == null || uploadImage.image.Length == 0)
+        return BadRequest("Resim seçilmedi.");
+        
+    if (uploadImage.image.Length > 3 * 1024 * 1024)
+        return BadRequest("Dosya boyutu 3 MB'ı geçmemeli.");
+
+    string[] allowedFileExtensions = [".jpg", ".jpeg", ".png"];
+    
+    // 2. Kullanıcıyı getir
+    var user = await _context.Users.FirstOrDefaultAsync(u => u.Id == userId);
+    if (user == null) return NotFound("Kullanıcı bulunamadı.");
+
+    // Eski dosya ismini hafızada tut (İşlem sonunda sileceğiz)
+    string oldFileName = null;
+    if (!string.IsNullOrEmpty(user.ProfileImageUrl)) 
+    {
+        // URL'den dosya adını ayıklıyoruz (Path.GetFileName daha güvenlidir)
+        oldFileName = Path.GetFileName(user.ProfileImageUrl);
+    }
+
+    try
+    {
+        // 3. Yeni dosyayı diske kaydet
+        string createdImageName = await _fileService.SaveFileAsync(uploadImage.image, allowedFileExtensions, profile: true);
+
+        // 4. Veritabanını güncelle (Sadece dosya adını veya relative path'i tutmak daha iyidir)
+        // Veritabanına tam URL yerine "/ProfileImages/resim.jpg" formatında kaydediyoruz.
+        user.ProfileImageUrl = $"/ProfileImages/{createdImageName}"; 
+        
+        _context.Users.Update(user);
+        await _context.SaveChangesAsync(); // <-- BURASI EKSİKTİ
+
+        // 5. Her şey başarılıysa, ARTIK eski dosyayı diskten silebiliriz
+        if (!string.IsNullOrEmpty(oldFileName))
+        {
+             _fileService.DeleteFile(oldFileName, profile: true);
+        }
+
+        // 6. Response dön (Full URL oluşturarak)
+        var scheme = HttpContext.Request.Scheme;
+        var host = HttpContext.Request.Host.Value;
+        var fullUrl = $"{scheme}://{host}{user.ProfileImageUrl}";
+
+        return Ok(new { url = fullUrl });
+    }
+    catch (Exception error)
+    {
+        // Hata loglanabilir
+        return BadRequest($"Yükleme hatası: {error.Message}");
+    }
+}
+
         [HttpGet("MyFiles")]
         [Authorize]
         public async Task<IActionResult> MyFiles()
