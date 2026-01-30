@@ -1,119 +1,100 @@
-<header>
-        <h1>🚀 ProjectAPI</h1>
-        <p>Bu proje, temel kurumsal işlemler için geliştirilmiş, <strong>.NET 7.0</strong> altyapısını kullanan güçlü ve ölçeklenebilir bir <strong>RESTful API</strong> servisidir.</p>
-        
-        <div class="badges">
-            <img src="https://img.shields.io/github/license/hdprogramming/ProjectAPI" alt="License" class="badge">
-            <img src="https://img.shields.io/github/stars/hdprogramming/ProjectAPI" alt="Stars" class="badge">
-            <img src="https://img.shields.io/github/last-commit/hdprogramming/ProjectAPI" alt="Last Commit" class="badge">
-        </div>
-    </header>
+# 🚀 ProjectAPI
 
-    <hr>
+Bu proje, temel kurumsal işlemler için geliştirilmiş, **.NET 7.0** altyapısını kullanan güçlü ve ölçeklenebilir bir **RESTful API** servisidir.
 
-    <section>
-        <h2>🌟 Özellikler</h2>
-        <ul>
-            <li><strong>RESTful Mimari:</strong> CRUD operasyonları için standart HTTP metodlarının kullanımı.</li>
-            <li><strong>Hızlı ve Güvenilir:</strong> Performans için optimize edilmiş .NET 7.0 altyapısı.</li>
-            <li><strong>OpenAPI Desteği:</strong> Swagger UI aracılığıyla uç nokta testleri ve otomatik dökümantasyon.</li>
-            <li><strong>Katmanlı Mimari:</strong> Sürdürülebilirlik ve test edilebilirlik için ayrılmış katmanlar (Repository/Service Pattern).</li>
-            <li><strong>Veritabanı Entegrasyonu:</strong> Entity Framework Core / SQL Server Desteği.</li>
-        </ul>
-    </section>
+[![GitHub lisansı](https://img.shields.io/github/license/hdprogramming/ProjectAPI)](https://github.com/hdprogramming/ProjectAPI/blob/main/LICENSE)
+[![GitHub yıldız sayısı](https://img.shields.io/github/stars/hdprogramming/ProjectAPI)](https://github.com/hdprogramming/ProjectAPI/stargazers)
+[![GitHub son commit](https://img.shields.io/github/last-commit/hdprogramming/ProjectAPI)](https://github.com/hdprogramming/ProjectAPI/commits/main)
 
-    <section>
-        <h2>🛠️ Kullanılan Teknolojiler</h2>
-        <ul>
-            <li><strong>Backend Framework:</strong> <a href="https://dotnet.microsoft.com/en-us/download/dotnet/7.0">.NET 7.0 (ASP.NET Core API)</a></li>
-            <li><strong>Programlama Dili:</strong> C#</li>
-            <li><strong>ORM:</strong> Entity Framework Core</li>
-            <li><strong>Dökümantasyon:</strong> Swashbuckle (Swagger UI)</li>
-        </ul>
-    </section>
+---
 
-    <section>
-        <h2>📦 Kurulum ve Çalıştırma</h2>
-        <p>Projenin yerel makinenizde geliştirme ortamında çalıştırılması için aşağıdaki adımları izleyin.</p>
+### 🌟 Özellikler
 
-        <h3>📝 Ön Koşullar</h3>
-        <ul>
-            <li>.NET 7.0 SDK veya daha yenisi.</li>
-            <li>Tercih edilen bir IDE (Visual Studio, VS Code vb.).</li>
-            <li>SQL Server veya uygun bir veritabanı sunucusu.</li>
-        </ul>
+* **RESTful Mimari:** CRUD operasyonları için standart HTTP metodlarının kullanımı.
+* **Hızlı ve Güvenilir:** Performans için optimize edilmiş .NET 7.0 altyapısı.
+* **OpenAPI Desteği:** Swagger UI aracılığıyla uç nokta testleri ve otomatik dökümantasyon.
+* **Katmanlı Mimari:** Sürdürülebilirlik ve test edilebilirlik için ayrılmış katmanlar (**Repository/Service Pattern**).
+* **Veritabanı Entegrasyonu:** Entity Framework Core desteği.
 
-        <h3>⚙️ Adımlar</h3>
-        <ol>
-            <li>
-                <strong>Projeyi Klonlayın:</strong>
-                <pre><code>git clone https://github.com/hdprogramming/ProjectAPI.git
-cd ProjectAPI/ProjectAPI</code></pre>
-            </li>
-            <li>
-                <strong>Ortam Ayarlarını Yapılandırın:</strong>
-                <p><code>appsettings.Development.json</code> dosyasındaki <code>ConnectionStrings</code> bölümünü kendi yerel veritabanı ayarlarınıza göre güncelleyin.</p>
-            </li>
-            <li>
-                <strong>Veritabanını Hazırlayın:</strong>
-                <pre><code>dotnet ef database update</code></pre>
-            </li>
-            <li>
-                <strong>Projeyi Çalıştırın:</strong>
-                <pre><code>dotnet run</code></pre>
-            </li>
-        </ol>
-    </section>
+---
 
-    <section>
-        <h2>🌐 Erişim</h2>
-        <p>Uygulama çalıştıktan sonra aşağıdaki adreslerden erişilebilir:</p>
-        <table>
-            <thead>
-                <tr>
-                    <th>Protokol</th>
-                    <th>Adres</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td>HTTP</td>
-                    <td><code>http://localhost:5000</code></td>
-                </tr>
-                <tr>
-                    <td>HTTPS</td>
-                    <td><code>https://localhost:5001</code></td>
-                </tr>
-                <tr>
-                    <td><strong>Swagger UI</strong></td>
-                    <td><code>https://localhost:5001/swagger</code></td>
-                </tr>
-            </tbody>
-        </table>
-    </section>
+### 🛠️ Kullanılan Teknolojiler
 
-    <section>
-        <h2>🛣️ API Uç Noktaları</h2>
-        <p>Detaylı bilgi Swagger üzerinden sunulmaktadır ancak temel uç noktalar şunlardır:</p>
-        <table>
-            <thead>
-                <tr>
-                    <th>Metot</th>
-                    <th>Uç Nokta</th>
-                    <th>Açıklama</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td>GET</td>
-                    <td><code>/api/v1/products</code></td>
-                    <td>Ürün listesini getirir.</td>
-                </tr>
-                <tr>
-                    <td>POST</td>
-                    <td><code>/api/v1/auth/register</code></td>
-                    <td>Yeni kullanıcı kaydı oluşturur.</td>
-                </tr>
-            </tbody>
-        </table>
-    </section>
+| Araç | Açıklama |
+| :--- | :--- |
+| **Framework** | [.NET 7.0 (ASP.NET Core API)](https://dotnet.microsoft.com/en-us/download/dotnet/7.0) |
+| **Dil** | C# |
+| **ORM** | Entity Framework Core |
+| **Dökümantasyon** | Swashbuckle (Swagger UI) |
+
+---
+
+### 📦 Kurulum ve Çalıştırma
+
+Projenin yerel makinenizde geliştirme ortamında çalıştırılması için aşağıdaki adımları izleyin.
+
+#### 📝 Ön Koşullar
+* **.NET 7.0 SDK** veya daha yenisi.
+* Tercih edilen bir IDE (Visual Studio, VS Code vb.).
+* SQL Server veya uygun bir veritabanı sunucusu.
+
+#### ⚙️ Adımlar
+
+1.  **Projeyi Klonlayın:**
+    ```bash
+    git clone [https://github.com/hdprogramming/ProjectAPI.git](https://github.com/hdprogramming/ProjectAPI.git)
+    cd ProjectAPI/ProjectAPI
+    ```
+
+2.  **Ortam Ayarlarını Yapılandırın:**
+    `appsettings.Development.json` dosyasındaki `ConnectionStrings` bölümünü kendi yerel veritabanı ayarlarınıza göre güncelleyin.
+
+3.  **Veritabanını Hazırlayın:**
+    ```bash
+    dotnet ef database update
+    ```
+
+4.  **Projeyi Çalıştırın:**
+    ```bash
+    dotnet run
+    ```
+
+---
+
+### 🌐 Erişim
+
+Uygulama çalıştıktan sonra aşağıdaki adreslerden erişilebilir:
+
+| Servis | Adres |
+| :--- | :--- |
+| **HTTP** | `http://localhost:5000` |
+| **HTTPS** | `https://localhost:5001` |
+| **Swagger UI** | `https://localhost:5001/swagger` |
+
+---
+
+### 🛣️ API Uç Noktaları
+
+| Metot | Uç Nokta | Açıklama |
+| :---: | :--- | :--- |
+| `GET` | `/api/v1/products` | Ürün listesini getirir. |
+| `POST` | `/api/v1/auth/register` | Yeni kullanıcı kaydı oluşturur. |
+| `GET` | `/api/v1/users/{id}` | Belirli bir kullanıcıyı getirir. |
+
+---
+
+### 🤝 Katkıda Bulunma
+
+1.  Projeyi Fork'layın.
+2.  Yeni bir Branch oluşturun (`git checkout -b feature/yeniOzellik`).
+3.  Değişikliklerinizi Commit edin (`git commit -m 'Yeni özellik eklendi'`).
+4.  Branch'inizi Push edin (`git push origin feature/yeniOzellik`).
+5.  Bir Pull Request oluşturun.
+
+---
+
+### 📧 İletişim
+
+**hdprogramming** - [GitHub Profilim](https://github.com/hdprogramming)
+
+---
