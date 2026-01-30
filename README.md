@@ -1,76 +1,119 @@
-<h2>🚀 ProjectAPI</h2>
-<p>Bu proje, temel kurumsal işlemler (kullanıcı/ürün yönetimi gibi) için geliştirilmiş, .NET 7.0 altyapısını kullanan güçlü ve ölçeklenebilir bir RESTful API servisidir.</p>
+<header>
+        <h1>🚀 ProjectAPI</h1>
+        <p>Bu proje, temel kurumsal işlemler için geliştirilmiş, <strong>.NET 7.0</strong> altyapısını kullanan güçlü ve ölçeklenebilir bir <strong>RESTful API</strong> servisidir.</p>
+        
+        <div class="badges">
+            <img src="https://img.shields.io/github/license/hdprogramming/ProjectAPI" alt="License" class="badge">
+            <img src="https://img.shields.io/github/stars/hdprogramming/ProjectAPI" alt="Stars" class="badge">
+            <img src="https://img.shields.io/github/last-commit/hdprogramming/ProjectAPI" alt="Last Commit" class="badge">
+        </div>
+    </header>
 
-<h4>Özellikler</h4>
-<p>RESTful Mimari: CRUD operasyonları için standart HTTP metodlarının kullanımı.
+    <hr>
 
-Hızlı ve Güvenilir: Performans için optimize edilmiş .NET 7.0 altyapısı.
+    <section>
+        <h2>🌟 Özellikler</h2>
+        <ul>
+            <li><strong>RESTful Mimari:</strong> CRUD operasyonları için standart HTTP metodlarının kullanımı.</li>
+            <li><strong>Hızlı ve Güvenilir:</strong> Performans için optimize edilmiş .NET 7.0 altyapısı.</li>
+            <li><strong>OpenAPI Desteği:</strong> Swagger UI aracılığıyla uç nokta testleri ve otomatik dökümantasyon.</li>
+            <li><strong>Katmanlı Mimari:</strong> Sürdürülebilirlik ve test edilebilirlik için ayrılmış katmanlar (Repository/Service Pattern).</li>
+            <li><strong>Veritabanı Entegrasyonu:</strong> Entity Framework Core / SQL Server Desteği.</li>
+        </ul>
+    </section>
 
-OpenAPI Desteği: Swagger UI aracılığıyla uç nokta testleri ve otomatik dökümantasyon.
+    <section>
+        <h2>🛠️ Kullanılan Teknolojiler</h2>
+        <ul>
+            <li><strong>Backend Framework:</strong> <a href="https://dotnet.microsoft.com/en-us/download/dotnet/7.0">.NET 7.0 (ASP.NET Core API)</a></li>
+            <li><strong>Programlama Dili:</strong> C#</li>
+            <li><strong>ORM:</strong> Entity Framework Core</li>
+            <li><strong>Dökümantasyon:</strong> Swashbuckle (Swagger UI)</li>
+        </ul>
+    </section>
 
-Katmanlı Mimari: Sürdürülebilirlik ve test edilebilirlik için ayrılmış katmanlar (Örn: Repository/Service Pattern).
+    <section>
+        <h2>📦 Kurulum ve Çalıştırma</h2>
+        <p>Projenin yerel makinenizde geliştirme ortamında çalıştırılması için aşağıdaki adımları izleyin.</p>
 
-Veritabanı Entegrasyonu: [Veritabanı adı buraya gelecek - Örn: Entity Framework Core / Dapper].
+        <h3>📝 Ön Koşullar</h3>
+        <ul>
+            <li>.NET 7.0 SDK veya daha yenisi.</li>
+            <li>Tercih edilen bir IDE (Visual Studio, VS Code vb.).</li>
+            <li>SQL Server veya uygun bir veritabanı sunucusu.</li>
+        </ul>
 
-🛠️ Kullanılan Teknolojiler
-Bu API projesinde aşağıdaki temel teknolojiler ve kütüphaneler kullanılmıştır:
+        <h3>⚙️ Adımlar</h3>
+        <ol>
+            <li>
+                <strong>Projeyi Klonlayın:</strong>
+                <pre><code>git clone https://github.com/hdprogramming/ProjectAPI.git
+cd ProjectAPI/ProjectAPI</code></pre>
+            </li>
+            <li>
+                <strong>Ortam Ayarlarını Yapılandırın:</strong>
+                <p><code>appsettings.Development.json</code> dosyasındaki <code>ConnectionStrings</code> bölümünü kendi yerel veritabanı ayarlarınıza göre güncelleyin.</p>
+            </li>
+            <li>
+                <strong>Veritabanını Hazırlayın:</strong>
+                <pre><code>dotnet ef database update</code></pre>
+            </li>
+            <li>
+                <strong>Projeyi Çalıştırın:</strong>
+                <pre><code>dotnet run</code></pre>
+            </li>
+        </ol>
+    </section>
 
-Backend Framework: .NET 7.0 (ASP.NET Core API)
+    <section>
+        <h2>🌐 Erişim</h2>
+        <p>Uygulama çalıştıktan sonra aşağıdaki adreslerden erişilebilir:</p>
+        <table>
+            <thead>
+                <tr>
+                    <th>Protokol</th>
+                    <th>Adres</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>HTTP</td>
+                    <td><code>http://localhost:5000</code></td>
+                </tr>
+                <tr>
+                    <td>HTTPS</td>
+                    <td><code>https://localhost:5001</code></td>
+                </tr>
+                <tr>
+                    <td><strong>Swagger UI</strong></td>
+                    <td><code>https://localhost:5001/swagger</code></td>
+                </tr>
+            </tbody>
+        </table>
+    </section>
 
-Programlama Dili: C#
-
-Veritabanı: [Kullandığın veritabanı - Örn: SQL Server / PostgreSQL / SQLite]
-
-ORM: [Kullandığın ORM - Örn: Entity Framework Core]
-
-Dökümantasyon: Swashbuckle (Swagger UI)</p>
-
-📦 Kurulum ve Çalıştırma
-Projenin yerel makinenizde geliştirme ortamında çalıştırılması için aşağıdaki adımları izleyin.
-
-📝 Ön Koşullar
-Sisteminizde aşağıdaki yazılımların kurulu olması gerekmektedir:
-
-.NET 7.0 SDK veya daha yenisi.
-
-Tercih edilen bir IDE (Örn: Visual Studio, Visual Studio Code, JetBrains Rider).
-
-[Kullandığın veritabanı sunucusu - Örn: SQL Server LocalDB veya PostgreSQL].
-
-⚙️ Adımlar
-Projeyi Klonlayın:
-
-Bash
-git clone https://github.com/hdprogramming/ProjectAPI.git
-cd ProjectAPI/ProjectAPI # Ana .csproj dosyasının olduğu dizine girin
-Ortam Ayarlarını Yapılandırın:
-
-appsettings.Development.json dosyasını açın.
-
-Veritabanı Bağlantı Dizesini (ConnectionStrings) kendi yerel veritabanı ayarlarınıza göre güncelleyin.
-
-Veritabanını Hazırlayın (Gerekliyse):
-
-Entity Framework Core kullanıyorsanız, migrasyonları uygulayın:
-
-Bash
-dotnet ef database update
-Projeyi Çalıştırın:
-
-Projenin ana dizinindeyken (.csproj dosyasının olduğu yerde):
-
-Bash
-dotnet run
-Alternatif: IDE (Visual Studio/VS Code) üzerinden Run veya Debug tuşuna basarak da çalıştırabilirsiniz.
-
-🌐 Erişim
-Uygulama varsayılan olarak şu adreslerde yayında olacaktır:
-
-HTTP: http://localhost:5000 (veya 7000 küsurlu bir port)
-
-HTTPS: https://localhost:5001 (veya 7000 küsurlu bir port)
-
-Swagger dökümantasyonuna genellikle /swagger yolundan erişebilirsiniz: https://localhost:5001/swagger
-
-🛣️ API Uç Noktaları ve Dökümantasyon
-Tüm mevcut uç noktaların detaylı bilgileri ve deneme ekranı, uygulama çalışır durumdayken Swagger UI üzerinden otomatik olarak sağlanmaktadır.
+    <section>
+        <h2>🛣️ API Uç Noktaları</h2>
+        <p>Detaylı bilgi Swagger üzerinden sunulmaktadır ancak temel uç noktalar şunlardır:</p>
+        <table>
+            <thead>
+                <tr>
+                    <th>Metot</th>
+                    <th>Uç Nokta</th>
+                    <th>Açıklama</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>GET</td>
+                    <td><code>/api/v1/products</code></td>
+                    <td>Ürün listesini getirir.</td>
+                </tr>
+                <tr>
+                    <td>POST</td>
+                    <td><code>/api/v1/auth/register</code></td>
+                    <td>Yeni kullanıcı kaydı oluşturur.</td>
+                </tr>
+            </tbody>
+        </table>
+    </section>
