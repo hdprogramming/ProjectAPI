@@ -1,67 +1,76 @@
-Markdown
+🚀 ProjectAPI
+Bu proje, temel kurumsal işlemler (kullanıcı/ürün yönetimi gibi) için geliştirilmiş, .NET 7.0 altyapısını kullanan güçlü ve ölçeklenebilir bir RESTful API servisidir.
 
-# ProjectCLVue 🚀
+🌟 Özellikler
+RESTful Mimari: CRUD operasyonları için standart HTTP metodlarının kullanımı.
 
-Bu proje, **Vue 3** ve **Vite** kullanılarak geliştirilmiş modern bir frontend uygulamasıdır. İçerisinde dosya yönetimi, metin editörü (Quill) ve güvenli veri işleme yapıları barındırır.
+Hızlı ve Güvenilir: Performans için optimize edilmiş .NET 7.0 altyapısı.
 
-> ⚠️ **DİKKAT: Geliştirme Süreci Devam Ediyor!** > Bu proje şu anda aktif geliştirme aşamasındadır (WIP). Bazı özellikler tamamlanmamış olabilir veya ciddi hatalar (bug) içerebilir. Kullanırken veya incelerken bunu göz önünde bulundurunuz.
+OpenAPI Desteği: Swagger UI aracılığıyla uç nokta testleri ve otomatik dökümantasyon.
 
-## 🛠️ Önerilen IDE Kurulumu
+Katmanlı Mimari: Sürdürülebilirlik ve test edilebilirlik için ayrılmış katmanlar (Örn: Repository/Service Pattern).
 
-Bu proje için en verimli geliştirme ortamı:
+Veritabanı Entegrasyonu: [Veritabanı adı buraya gelecek - Örn: Entity Framework Core / Dapper].
 
-- [VS Code](https://code.visualstudio.com/) 
-- [Vue - Official](https://marketplace.visualstudio.com/items?itemName=Vue.volar) eklentisi.
-  - *Not: Eğer yüklüyse `Vetur` eklentisini devre dışı bırakın.*
+🛠️ Kullanılan Teknolojiler
+Bu API projesinde aşağıdaki temel teknolojiler ve kütüphaneler kullanılmıştır:
 
-## 🌐 Önerilen Tarayıcı Kurulumu
+Backend Framework: .NET 7.0 (ASP.NET Core API)
 
-Vue 3 reaktivite sistemini ve değişkenleri rahatça inceleyebilmek için:
+Programlama Dili: C#
 
-### Chromium Tabanlı Tarayıcılar (Chrome, Edge, Brave vb.)
-1. [Vue.js devtools](https://chrome.google.com/webstore/detail/vuejs-devtools/nhdogjmejiglipccpnnnanhbledajbpd) eklentisini yükleyin.
-2. **Chrome DevTools** Ayarlarını açın (F12 -> Ayarlar).
-3. "Console" bölümü altındaki **"Enable custom formatters"** seçeneğini işaretleyin.
+Veritabanı: [Kullandığın veritabanı - Örn: SQL Server / PostgreSQL / SQLite]
 
-### Firefox
-1. [Vue.js devtools](https://addons.mozilla.org/en-US/firefox/addon/vue-js-devtools/) eklentisini yükleyin.
-2. **Firefox DevTools** Ayarlarını açın.
-3. **"Enable custom formatters"** seçeneğini aktif hale getirin.
+ORM: [Kullandığın ORM - Örn: Entity Framework Core]
 
-## ⚙️ Proje Kurulumu
+Dökümantasyon: Swashbuckle (Swagger UI)
 
-Projeyi klonladıktan sonra gerekli bağımlılıkları yüklemek için terminalde şu komutu çalıştırın:
+📦 Kurulum ve Çalıştırma
+Projenin yerel makinenizde geliştirme ortamında çalıştırılması için aşağıdaki adımları izleyin.
 
-```sh
-npm install
-Geliştirme Modunda Çalıştırma (Hot-Reload)
-Projeyi yerel sunucuda başlatmak ve anlık değişiklikleri görmek için:
+📝 Ön Koşullar
+Sisteminizde aşağıdaki yazılımların kurulu olması gerekmektedir:
 
-Bash
+.NET 7.0 SDK veya daha yenisi.
 
-npm run dev
-Canlı Ortam İçin Derleme (Production Build)
-Projeyi yayına hazırlamak, sıkıştırmak ve optimize etmek için:
+Tercih edilen bir IDE (Örn: Visual Studio, Visual Studio Code, JetBrains Rider).
+
+[Kullandığın veritabanı sunucusu - Örn: SQL Server LocalDB veya PostgreSQL].
+
+⚙️ Adımlar
+Projeyi Klonlayın:
 
 Bash
+git clone https://github.com/hdprogramming/ProjectAPI.git
+cd ProjectAPI/ProjectAPI # Ana .csproj dosyasının olduğu dizine girin
+Ortam Ayarlarını Yapılandırın:
 
-npm run build
-📂 Özellikler (Özet)
-Vue 3 Composition API: <script setup> yapısı ile temiz kod.
+appsettings.Development.json dosyasını açın.
 
-XSS Koruması: DOMPurify ile güvenli HTML render işlemleri.
+Veritabanı Bağlantı Dizesini (ConnectionStrings) kendi yerel veritabanı ayarlarınıza göre güncelleyin.
 
-Dosya Yöneticisi: Resim yükleme, silme ve düzenleme modülü.
+Veritabanını Hazırlayın (Gerekliyse):
 
-Zengin Metin Editörü: Quill Editor entegrasyonu.
+Entity Framework Core kullanıyorsanız, migrasyonları uygulayın:
 
-Router Yapısı: ID tabanlı dinamik sayfa yönlendirmeleri.
+Bash
+dotnet ef database update
+Projeyi Çalıştırın:
 
-🔧 Konfigürasyon
-Vite ayarlarını özelleştirmek için Vite Configuration Reference sayfasına bakabilirsiniz.
+Projenin ana dizinindeyken (.csproj dosyasının olduğu yerde):
 
+Bash
+dotnet run
+Alternatif: IDE (Visual Studio/VS Code) üzerinden Run veya Debug tuşuna basarak da çalıştırabilirsiniz.
 
-### Nasıl Kullanırsın?
-1.  Proje klasöründe `README.md` adında bir dosya oluştur.
-2.  Yukarıdaki kodu kopyalayıp içine yapıştır.
-3.  Kaydet.
+🌐 Erişim
+Uygulama varsayılan olarak şu adreslerde yayında olacaktır:
+
+HTTP: http://localhost:5000 (veya 7000 küsurlu bir port)
+
+HTTPS: https://localhost:5001 (veya 7000 küsurlu bir port)
+
+Swagger dökümantasyonuna genellikle /swagger yolundan erişebilirsiniz: https://localhost:5001/swagger
+
+🛣️ API Uç Noktaları ve Dökümantasyon
+Tüm mevcut uç noktaların detaylı bilgileri ve deneme ekranı, uygulama çalışır durumdayken Swagger UI üzerinden otomatik olarak sağlanmaktadır.
