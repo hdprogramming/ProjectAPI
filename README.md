@@ -1,8 +1,8 @@
-🚀 ProjectAPI
-Bu proje, temel kurumsal işlemler (kullanıcı/ürün yönetimi gibi) için geliştirilmiş, .NET 7.0 altyapısını kullanan güçlü ve ölçeklenebilir bir RESTful API servisidir.
+<h2>🚀 ProjectAPI</h2>
+<p>Bu proje, temel kurumsal işlemler (kullanıcı/ürün yönetimi gibi) için geliştirilmiş, .NET 7.0 altyapısını kullanan güçlü ve ölçeklenebilir bir RESTful API servisidir.</p>
 
-🌟 Özellikler
-RESTful Mimari: CRUD operasyonları için standart HTTP metodlarının kullanımı.
+<h4>Özellikler</h4>
+<p>RESTful Mimari: CRUD operasyonları için standart HTTP metodlarının kullanımı.
 
 Hızlı ve Güvenilir: Performans için optimize edilmiş .NET 7.0 altyapısı.
 
@@ -23,7 +23,7 @@ Veritabanı: [Kullandığın veritabanı - Örn: SQL Server / PostgreSQL / SQLit
 
 ORM: [Kullandığın ORM - Örn: Entity Framework Core]
 
-Dökümantasyon: Swashbuckle (Swagger UI)
+Dökümantasyon: Swashbuckle (Swagger UI)</p>
 
 📦 Kurulum ve Çalıştırma
 Projenin yerel makinenizde geliştirme ortamında çalıştırılması için aşağıdaki adımları izleyin.
