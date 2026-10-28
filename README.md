@@ -11,7 +11,7 @@ Bu proje, temel kurumsal işlemler için geliştirilmiş, **.NET 8.0** altyapıs
 ### 🌟 Özellikler
 
 * **RESTful Mimari:** CRUD operasyonları için standart HTTP metodlarının kullanımı.
-* **Hızlı ve Güvenilir:** Performans için optimize edilmiş .NET 7.0 altyapısı.
+* **Hızlı ve Güvenilir:** Performans için optimize edilmiş .NET 8.0 altyapısı.
 * **OpenAPI Desteği:** Swagger UI aracılığıyla uç nokta testleri ve otomatik dökümantasyon.
 * **Katmanlı Mimari:** Sürdürülebilirlik ve test edilebilirlik için ayrılmış katmanlar (**Repository/Service Pattern**).
 * **Veritabanı Entegrasyonu:** Entity Framework Core desteği.
