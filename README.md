@@ -1,6 +1,6 @@
 # 🚀 ProjectAPI
 
-Bu proje, temel kurumsal işlemler için geliştirilmiş, **.NET 7.0** altyapısını kullanan güçlü ve ölçeklenebilir bir **RESTful API** servisidir.
+Bu proje, temel kurumsal işlemler için geliştirilmiş, **.NET 8.0** altyapısını kullanan güçlü ve ölçeklenebilir bir **RESTful API** servisidir.
 
 [![GitHub lisansı](https://img.shields.io/github/license/hdprogramming/ProjectAPI)](https://github.com/hdprogramming/ProjectAPI/blob/main/LICENSE)
 [![GitHub yıldız sayısı](https://img.shields.io/github/stars/hdprogramming/ProjectAPI)](https://github.com/hdprogramming/ProjectAPI/stargazers)
@@ -22,7 +22,7 @@ Bu proje, temel kurumsal işlemler için geliştirilmiş, **.NET 7.0** altyapıs
 
 | Araç | Açıklama |
 | :--- | :--- |
-| **Framework** | [.NET 7.0 (ASP.NET Core API)](https://dotnet.microsoft.com/en-us/download/dotnet/7.0) |
+| **Framework** | [.NET 8.0 (ASP.NET Core API)](https://dotnet.microsoft.com/en-us/download/dotnet/8.0) |
 | **Dil** | C# |
 | **ORM** | Entity Framework Core |
 | **Dökümantasyon** | Swashbuckle (Swagger UI) |
@@ -34,7 +34,7 @@ Bu proje, temel kurumsal işlemler için geliştirilmiş, **.NET 7.0** altyapıs
 Projenin yerel makinenizde geliştirme ortamında çalıştırılması için aşağıdaki adımları izleyin.
 
 #### 📝 Ön Koşullar
-* **.NET 7.0 SDK** veya daha yenisi.
+* **.NET 8.0 SDK** veya daha yenisi.
 * Tercih edilen bir IDE (Visual Studio, VS Code vb.).
 * SQL Server veya uygun bir veritabanı sunucusu.
 
